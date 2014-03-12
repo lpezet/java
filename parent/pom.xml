@@ -129,7 +129,7 @@
 
 	<repositories>
 		<repository>
-			<id>lpezet-snapshots</id>
+			<id>lpezet-snapshot</id>
 			<url>https://repository-lpezet.forge.cloudbees.com/snapshot/</url>
 			<name>LPezet Snapshot Repo</name>
 			<snapshots>
@@ -140,7 +140,7 @@
 			</releases>
 		</repository>
 		<repository>
-			<id>lpezet-releases</id>
+			<id>lpezet-release</id>
 			<url>https://repository-lpezet.forge.cloudbees.com/release/</url>
 			<name>LPezet Snapshot Repo</name>
 			<snapshots>
@@ -153,8 +153,8 @@
 	</repositories>
 
 	<scm>
-		<connection>scm:git:git@github.com:lpezet/java.git</connection>
-		<developerConnection>scm:git:git@github.com:lpezet/java.git</developerConnection>
+		<connection>scm:git:ssh://git@github.com/lpezet/java.git</connection>
+    	<developerConnection>scm:git:ssh://git@github.com/lpezet/java.git</developerConnection>
 		<url>https://github.com/lpezet/java</url>
 	</scm>
 
