@@ -31,7 +31,7 @@
 	<parent>
 		<groupId>com.github.lpezet.java</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 
 	<build>
@@ -88,12 +88,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.gdata</groupId>
-			<artifactId>core</artifactId>
-			<version>1.47.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.3.3</version>
@@ -103,11 +97,13 @@
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-books</artifactId>
 			<version>v1-rev35-1.17.0-rc</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.http-client</groupId>
 			<artifactId>google-http-client-jackson2</artifactId>
 			<version>1.17.0-rc</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
