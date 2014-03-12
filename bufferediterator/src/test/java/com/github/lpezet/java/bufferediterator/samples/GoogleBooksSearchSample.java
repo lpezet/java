@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import com.github.lpezet.java.bufferediterator.BufferedIterator;
 import com.github.lpezet.java.bufferediterator.PaginationIterator;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -105,8 +108,12 @@ public class GoogleBooksSearchSample {
 		}
 	}
 
-	public static void main(String[] pArgs) throws Exception {
-		//Google
+	@Ignore
+	@Test
+	public void doIt() throws Exception {
+		// either one
+		iterableLoop();
+		//iterableLoop();
 	}
 
 	public void iteratorLoop() throws Exception {
