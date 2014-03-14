@@ -206,7 +206,7 @@
 						<attach>true</attach>
 						<source>1.6</source>
 						<quiet>true</quiet>
-						<bottom>Tripfilms Gamification</bottom>
+						<bottom>LP</bottom>
 						<detectOfflineLinks>false</detectOfflineLinks>
 						<javadocVersion>1.6</javadocVersion>
 						<encoding>UTF-8</encoding>
