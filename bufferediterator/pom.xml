@@ -30,7 +30,6 @@
 					</properties>
 					<includes>
                         <include>src/**</include>
-                        <include>pom.xml</include>
                     </includes>
 					<excludes>
 						<exclude>**/README</exclude>
