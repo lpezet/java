@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
  * @author luc
  *
  */
-public class BasicResultHolder<T> implements IAsyncResult<T> {
+public class AsyncResult<T> implements IAsyncResult<T> {
 
 	private Object mLock = new Object();
 	private Callback<T> mCallback;
@@ -22,7 +22,7 @@ public class BasicResultHolder<T> implements IAsyncResult<T> {
 	/**
 	 * Executes command with custom callable.
 	 */
-	public BasicResultHolder(ExecutorService pExecutorService, final ICommand<T> pImpl) {
+	public AsyncResult(ExecutorService pExecutorService, final ICommand<T> pImpl) {
 		mFutureResult = pExecutorService.submit(new Callable<T>() {
 			@Override
 			public T call() throws Exception {

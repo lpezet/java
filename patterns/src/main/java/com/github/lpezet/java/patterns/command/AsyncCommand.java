@@ -43,7 +43,7 @@ public class AsyncCommand<T> implements ICommand<IAsyncResult<T>> {
 
 	@Override
 	public IAsyncResult<T> execute() {
-		return new BasicResultHolder<T>(mExecutorService, mImpl);
+		return new AsyncResult<T>(mExecutorService, mImpl);
 	}
 
 }
