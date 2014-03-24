@@ -25,15 +25,13 @@
  */
 package com.github.lpezet.java.patterns.command;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 
 /**
  * @author luc
  *
  */
-public class AsyncCommand<T> implements IAsyncCommand<T> {
+public class AsyncCommand<T> implements ICommand<IAsyncResult<T>> {
 	
 	private ExecutorService mExecutorService;
 	private ICommand<T> mImpl;
@@ -44,38 +42,8 @@ public class AsyncCommand<T> implements IAsyncCommand<T> {
 	}
 
 	@Override
-	public Future<T> execute(final Callback<T> pCallback) {
-		if (pCallback != null) {
-			return mExecutorService.submit(new Callable<T>() {
-					@Override
-					public T call() throws Exception {
-						T oResult = doExecute();
-						pCallback.callback(oResult);
-						return oResult;
-					}
-			});
-		} else {
-			return mExecutorService.submit(new Callable<T>() {
-				@Override
-				public T call() throws Exception {
-					return doExecute();
-				}
-			});
-		}
-	}
-	
-	public void $doit() {
-		
-	}
-	
-	@Override
-	public Future<T> execute() {
-		return execute(null);
-	}
-
-	protected T doExecute() throws Exception {
-		System.out.println(Thread.currentThread().getName() + ": executing impl...");
-		return mImpl.execute();
+	public IAsyncResult<T> execute() {
+		return new BasicResultHolder<T>(mExecutorService, mImpl);
 	}
 
 }
