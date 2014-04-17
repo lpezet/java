@@ -31,6 +31,8 @@ package com.github.lpezet.java.patterns.command;
  */
 public interface Callback<T> {
 
-	public void callback(T pResult);
+	public void onResult(T pResult);
+	
+	public void onException(Exception e);
 	
 }

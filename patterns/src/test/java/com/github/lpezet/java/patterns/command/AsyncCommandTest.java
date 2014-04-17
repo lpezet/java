@@ -54,9 +54,14 @@ public class AsyncCommandTest {
 		AsyncCommand<Integer> oAdvCmd = new AsyncCommand<Integer>(oExecutorService, oImpl);
 		Callback<Integer> oCallback = new Callback<Integer>() {
 			@Override
-			public void callback(Integer pResult) {
+			public void onResult(Integer pResult) {
 				System.out.println(Thread.currentThread().getName() + " : callback(" + pResult + ").");
 				
+			}
+			@Override
+			public void onException(Exception e) {
+				System.err.println("Got exception!");
+				e.printStackTrace(System.err);
 			}
 		};
 		IAsyncResult<Integer> oResultHolder = oAdvCmd.execute();

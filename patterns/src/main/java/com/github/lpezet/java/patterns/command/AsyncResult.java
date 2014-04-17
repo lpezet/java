@@ -14,26 +14,50 @@ import java.util.concurrent.TimeUnit;
  */
 public class AsyncResult<T> implements IAsyncResult<T> {
 
+	private static class ResultOrException<T> {
+		private T mResult;
+		private Exception mException;
+		
+		public ResultOrException(T pResult) {
+			mResult = pResult;
+		}
+		public ResultOrException(Exception pException) {
+			mException = pException;
+		}
+		public Exception getException() {
+			return mException;
+		}
+		public T getResult() {
+			return mResult;
+		}
+	}
 	private Object mLock = new Object();
 	private Callback<T> mCallback;
 	private boolean mCalledback = false;
-	private Future<T> mFutureResult;
+	private Future<ResultOrException<T>> mFutureResult;
 	
 	/**
 	 * Executes command with custom callable.
 	 */
 	public AsyncResult(ExecutorService pExecutorService, final ICommand<T> pImpl) {
-		mFutureResult = pExecutorService.submit(new Callable<T>() {
+		mFutureResult = pExecutorService.submit(new Callable<ResultOrException<T>>() {
 			@Override
-			public T call() throws Exception {
-				T oResults = pImpl.execute();
+			public ResultOrException<T> call() throws Exception {
+				Exception oError = null;
+				T oResults = null;
+				try {
+					oResults = pImpl.execute();
+				} catch (Exception e) {
+					oError = e;
+				}
 				synchronized (mLock) {
 					if (mCallback != null && !mCalledback) {
 						mCalledback = true;
-						mCallback.callback(oResults);
+						if (oError == null) mCallback.onResult(oResults);
+						else mCallback.onException(oError);
 					}
 				}
-				return oResults;		
+				return oError == null ? new ResultOrException<T>(oResults) : new ResultOrException<T>(oError);		
 			}
 		});
 	}
@@ -44,19 +68,25 @@ public class AsyncResult<T> implements IAsyncResult<T> {
 			mCallback = pCallback;
 			if (mFutureResult.isDone() && !mCalledback) {
 				mCalledback = true;
-				pCallback.callback(mFutureResult.get());
+				ResultOrException<T> oROE = mFutureResult.get();
+				if (oROE.getException() != null) pCallback.onException(oROE.getException());
+				else pCallback.onResult(oROE.getResult());
 			}
 		}
 	}
 
 	@Override
 	public T get() throws Exception {
-		return mFutureResult.get();
+		ResultOrException<T> oROE = mFutureResult.get();
+		if (oROE.getException() != null) throw oROE.getException();
+		else return oROE.getResult();
 	}
 	
 	@Override
 	public T get(long pTimeout, TimeUnit pTimeUnit) throws Exception {
-		return mFutureResult.get(pTimeout, pTimeUnit);
+		ResultOrException<T> oROE = mFutureResult.get(pTimeout, pTimeUnit);
+		if (oROE.getException() != null) throw oROE.getException();
+		else return oROE.getResult();
 	}
 
 }

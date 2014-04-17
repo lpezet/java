@@ -71,7 +71,7 @@ public class HttpCommandSample {
 		@Override
 		public Void execute() throws Exception {
 			HttpResponse oResponse = mHttpClient.execute(mHttpRequest);
-			mCallback.callback(oResponse);
+			mCallback.onResult(oResponse);
 			return null;
 		}
 		
@@ -96,10 +96,16 @@ public class HttpCommandSample {
 		HttpGet oHttpRequest = new HttpGet("http://localhost:8080/test");
 		Callback<HttpResponse> oCallback = new Callback<HttpResponse>() {
 			@Override
-			public void callback(HttpResponse pResponse) {
+			public void onResult(HttpResponse pResponse) {
 				System.out.println("Got response!!!");
 				//Exception e = new Exception();
 				//e.printStackTrace();
+			}
+			
+			@Override
+			public void onException(Exception e) {
+				System.err.println("Got exception!");
+				e.printStackTrace(System.err);
 			}
 		};
 		HttpCommand oHttpCommand = new HttpCommand(oHttpClient, oHttpRequest, oCallback);
