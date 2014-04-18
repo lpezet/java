@@ -25,14 +25,15 @@
  */
 package com.github.lpezet.java.patterns.circuitbreaker;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
-
-import com.github.lpezet.java.patterns.command.ICommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author luc
@@ -41,6 +42,8 @@ import com.github.lpezet.java.patterns.command.ICommand;
  *
  */
 public class SingleTryCircuitBreakerStrategy implements ICircuitBreakerHandler {
+	
+	private Logger mLogger = LoggerFactory.getLogger(SingleTryCircuitBreakerStrategy.class);
 	
 	private Lock mLock = new ReentrantLock();
 	private long mOpenToHalfOpenWaitTimeInMillis = 500;
@@ -54,25 +57,31 @@ public class SingleTryCircuitBreakerStrategy implements ICircuitBreakerHandler {
 	}
 	
 	@Override
-	public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, ICommand<T> pCommand) throws Exception {
+	public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, Callable<T> pCallable) throws Exception {
 		Duration oDuration = new Duration(pCircuitBreaker.getLastStateChangedDateUTC(), DateTime.now(DateTimeZone.UTC));
 		if (oDuration.getMillis() < mOpenToHalfOpenWaitTimeInMillis) {
+			if (mLogger.isTraceEnabled()) mLogger.trace("Open timeout not yet expired. Throwing CircuitBreakerOpenException.");
 			// The Open timeout has not yet expired. Throw a CircuitBreakerOpen exception to
 			// inform the caller that the caller that the call was not actually attempted, 
 			// and return the most recent exception received.
 			throw new CircuitBreakerOpenException(pCircuitBreaker.getLastException());
 		}
+		if (mLogger.isTraceEnabled()) mLogger.trace("Open timeout expired.");
 		// Limit the number of threads to be executed when the breaker is HalfOpen.
 		boolean oLockAcquired = mLock.tryLock();
 		if (!oLockAcquired) throw new CircuitBreakerOpenException();
+		if (mLogger.isTraceEnabled()) mLogger.trace("Acquired lock. Will try callable.");
 		pCircuitBreaker.halfOpen();
 		// Lock acquired, we'll try the operation again
 		try {
-			T oResult = pCommand.execute();
+			T oResult = pCallable.call();
+			if (mLogger.isTraceEnabled()) mLogger.trace("Resetting circuit breaker.");
 			// Operation succeeded so we reset the state to closed
 			pCircuitBreaker.reset();
 			return oResult;
 		} catch (Exception e) {
+			if (mLogger.isTraceEnabled()) mLogger.trace("Still getting exception from callable: {}. Tripping circuit breaker and re-throwing.", e.getMessage());
+			mLogger.error("Got exception.", e);
 			// If there is still an exception, trip the breaker again immediately.
 			pCircuitBreaker.trip(e);
 			// Throw the exception so that the caller knows which exception occurred.

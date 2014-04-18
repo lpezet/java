@@ -37,7 +37,7 @@ import org.junit.Test;
  */
 public class AsyncCommandTest {
 	
-	private static class MyTask implements ICommand<Integer> {
+	private static class MyCommand extends BaseCommand<Integer> {
 		private Random mRandom = new Random();
 		
 		@Override
@@ -50,7 +50,7 @@ public class AsyncCommandTest {
 	@Test
 	public void callback() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
-		MyTask oImpl = new MyTask();
+		MyCommand oImpl = new MyCommand();
 		AsyncCommand<Integer> oAdvCmd = new AsyncCommand<Integer>(oExecutorService, oImpl);
 		Callback<Integer> oCallback = new Callback<Integer>() {
 			@Override
@@ -74,7 +74,7 @@ public class AsyncCommandTest {
 	@Test
 	public void future() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
-		MyTask oImpl = new MyTask();
+		MyCommand oImpl = new MyCommand();
 		AsyncCommand<Integer> oAdvCmd = new AsyncCommand<Integer>(oExecutorService, oImpl);
 		IAsyncResult<Integer> oResultHolder = oAdvCmd.execute();
 		System.out.println(Thread.currentThread().getName() + ": could do something here...");

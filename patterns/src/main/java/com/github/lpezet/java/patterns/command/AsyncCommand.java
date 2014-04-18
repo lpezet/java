@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutorService;
  * @author luc
  *
  */
-public class AsyncCommand<T> implements ICommand<IAsyncResult<T>> {
+public class AsyncCommand<T> extends BaseCommand<IAsyncResult<T>> {
 	
 	private ExecutorService mExecutorService;
 	private ICommand<T> mImpl;

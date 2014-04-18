@@ -25,7 +25,7 @@
  */
 package com.github.lpezet.java.patterns.retry;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
 
 /**
  * @author luc
@@ -33,5 +33,11 @@ import com.github.lpezet.java.patterns.command.ICommand;
  */
 public interface IRetryStrategy {
 
+	public <T> T executeAndRetry(Callable<T> pCallable) throws Exception;
+	
+	/*
 	public <T> T executeAndRetry(ICommand<T> pCommand) throws Exception;
+	
+	public <T> T executeAndRetry(IActivity<T> pActivity, IContext pContext) throws Exception;
+	*/
 }

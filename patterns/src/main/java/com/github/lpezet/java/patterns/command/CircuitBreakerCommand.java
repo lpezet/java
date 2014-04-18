@@ -31,7 +31,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
  * @author luc
  *
  */
-public class CircuitBreakerCommand<T> implements ICommand<T> {
+public class CircuitBreakerCommand<T> extends BaseCommand<T> {
 
 	private ICommand<T> mImpl;
 	private ICircuitBreakerStrategy mCircuitBreakerStrategy;

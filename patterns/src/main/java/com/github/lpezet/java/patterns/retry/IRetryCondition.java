@@ -25,7 +25,7 @@
  */
 package com.github.lpezet.java.patterns.retry;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
 
 /**
  * @author luc
@@ -33,6 +33,6 @@ import com.github.lpezet.java.patterns.command.ICommand;
  */
 public interface IRetryCondition {
 
-	public <T> boolean shouldRetry(ICommand<T> pCommand, int pExecutions, Throwable pException);
+	public <T> boolean shouldRetry(Callable<T> pCallable, int pExecutions, Throwable pException);
 	
 }

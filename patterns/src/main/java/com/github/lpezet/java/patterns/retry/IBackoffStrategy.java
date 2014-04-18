@@ -25,7 +25,7 @@
  */
 package com.github.lpezet.java.patterns.retry;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
 
 /**
  * @author luc
@@ -33,6 +33,6 @@ import com.github.lpezet.java.patterns.command.ICommand;
  */
 public interface IBackoffStrategy {
 
-	public <T> void pauseBeforeNextRetry(ICommand<T> pCommand, int pExecutions, Throwable pLastException);
+	public <T> void pauseBeforeNextRetry(Callable<T> pCallable, int pExecutions, Throwable pLastException);
 	
 }

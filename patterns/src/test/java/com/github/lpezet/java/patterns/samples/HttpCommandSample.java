@@ -43,9 +43,9 @@ import org.mockito.stubbing.Answer;
 
 import com.github.lpezet.java.patterns.circuitbreaker.CircuitBreakerStrategies;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
+import com.github.lpezet.java.patterns.command.BaseCommand;
 import com.github.lpezet.java.patterns.command.Callback;
 import com.github.lpezet.java.patterns.command.CircuitBreakerCommand;
-import com.github.lpezet.java.patterns.command.ICommand;
 import com.github.lpezet.java.patterns.command.RetryCommand;
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
 import com.github.lpezet.java.patterns.retry.RetryStrategies;
@@ -56,7 +56,7 @@ import com.github.lpezet.java.patterns.retry.RetryStrategies;
  */
 public class HttpCommandSample {
 	
-	private static class HttpCommand implements ICommand<Void> {
+	private static class HttpCommand extends BaseCommand<Void> {
 		
 		private HttpClient mHttpClient;
 		private HttpUriRequest mHttpRequest;

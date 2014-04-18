@@ -25,11 +25,15 @@
  */
 package com.github.lpezet.java.patterns.command;
 
+import java.util.concurrent.Callable;
+
 /**
  * @author luc
+ * 
+ * @see <a href="http://mezzetin.blogspot.com/2014/03/execute-retry-trip.html">Command Patterns</a>
  *
  */
-public interface ICommand<T> {
+public interface ICommand<T> extends Callable<T> {
 
 	public T execute() throws Exception;
 	

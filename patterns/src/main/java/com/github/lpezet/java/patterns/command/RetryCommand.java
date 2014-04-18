@@ -31,7 +31,7 @@ import com.github.lpezet.java.patterns.retry.IRetryStrategy;
  * @author luc
  *
  */
-public class RetryCommand<T> implements ICommand<T> {
+public class RetryCommand<T> extends BaseCommand<T> {
 	
 	private ICommand<T> mImpl;
 	private IRetryStrategy mRetryStrategy;

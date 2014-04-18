@@ -25,13 +25,18 @@
  */
 package com.github.lpezet.java.patterns.circuitbreaker;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author luc
  *
  */
 public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
+	
+	private Logger mLogger = LoggerFactory.getLogger(BaseCircuitBreakerStrategy.class);
 	
 	private ICircuitBreaker mCircuitBreaker;
 	private ICircuitBreakerHandler mCircuitBreakerHandler;
@@ -42,13 +47,17 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 	}
 	
 	@Override
-	public <T> T executeAndTrip(ICommand<T> pCommand) throws Exception {
+	public <T> T executeAndTrip(Callable<T> pCallable) throws Exception {
 		if (!mCircuitBreaker.isClosed()) {
-			return mCircuitBreakerHandler.handleOpen(mCircuitBreaker, pCommand);
+			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker not closed. Handling open state...");
+			return mCircuitBreakerHandler.handleOpen(mCircuitBreaker, pCallable);
 		} else {
+			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker half open. Using callable.");
 			try {
-				return pCommand.execute();
+				return pCallable.call();
 			} catch (Exception e) {
+				if (mLogger.isTraceEnabled()) mLogger.trace("Got exception: {}. Tripping circuit breaker and re-throwing exception.", e.getMessage());
+				mLogger.error("Got exception. Will re-throw.", e);
 				mCircuitBreaker.trip(e);
 				throw e;
 			}

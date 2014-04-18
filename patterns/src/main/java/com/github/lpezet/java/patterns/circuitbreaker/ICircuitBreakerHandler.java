@@ -25,7 +25,7 @@
  */
 package com.github.lpezet.java.patterns.circuitbreaker;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
 
 /**
  * @author luc
@@ -33,6 +33,6 @@ import com.github.lpezet.java.patterns.command.ICommand;
  */
 public interface ICircuitBreakerHandler {
 
-	public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, ICommand<T> pCommand) throws Exception;
-	
+	public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, Callable<T> pCallable) throws Exception;
+		
 }

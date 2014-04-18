@@ -28,6 +28,7 @@ package com.github.lpezet.java.patterns.command;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class CircuitBreakerCommandTest {
 
 	@Test
 	public void noTrip() throws Exception {
-		ICommand<Void> oTestCommand = new ICommand<Void>() {
+		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
 			@Override
 			public Void execute() throws Exception {
 				return null;
@@ -56,13 +57,12 @@ public class CircuitBreakerCommandTest {
 		ICircuitBreaker oCB = new InMemoryCircuitBreaker();
 		ICircuitBreakerHandler oCBHandler = new ICircuitBreakerHandler() {
 			@Override
-			public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, ICommand<T> pImpl) throws Exception {
+			public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, Callable<T> pCallable) throws Exception {
 				try {
-					T oResult = pImpl.execute();
+					T oResult = pCallable.call();
 					pCircuitBreaker.reset();
 					return oResult;
-				} finally {
-				}
+				} finally {}
 			}
 		};
 		ICircuitBreakerStrategy oCBStrategy = new BaseCircuitBreakerStrategy(oCB, oCBHandler);
@@ -74,7 +74,7 @@ public class CircuitBreakerCommandTest {
 	@Test
 	public void tripThenReset() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		ICommand<Void> oTestCommand = new ICommand<Void>() {
+		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
 			@Override
 			public Void execute() throws Exception {
 				int oExecs = oExecutions.incrementAndGet();
@@ -86,9 +86,9 @@ public class CircuitBreakerCommandTest {
 		ICircuitBreaker oCB = new InMemoryCircuitBreaker();
 		ICircuitBreakerHandler oCBHandler = new ICircuitBreakerHandler() {
 			@Override
-			public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, ICommand<T> pImpl) throws Exception {
+			public <T> T handleOpen(ICircuitBreaker pCircuitBreaker, Callable<T> pCallable) throws Exception {
 				try {
-					T oResult = pImpl.execute();
+					T oResult = pCallable.call();
 					pCircuitBreaker.reset();
 					return oResult;
 				} finally {

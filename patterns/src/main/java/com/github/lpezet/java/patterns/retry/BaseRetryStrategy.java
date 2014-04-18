@@ -25,13 +25,18 @@
  */
 package com.github.lpezet.java.patterns.retry;
 
-import com.github.lpezet.java.patterns.command.ICommand;
+import java.util.concurrent.Callable;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author luc
  *
  */
 public class BaseRetryStrategy implements IRetryStrategy {
+	
+	private Logger mLogger = LoggerFactory.getLogger(BaseRetryStrategy.class);
 	
 	private IRetryCondition mRetryCondition;
 	private IBackoffStrategy mBackoffStrategy;
@@ -42,15 +47,21 @@ public class BaseRetryStrategy implements IRetryStrategy {
 	}
 	
 	@Override
-	public <T> T executeAndRetry(ICommand<T> pCommand) throws Exception {
+	public <T> T executeAndRetry(Callable<T> pCallable) throws Exception {
 		int oExecutions = 0;
 		while(true) {
 			oExecutions++;
 			try {
-				return pCommand.execute();
+				if (mLogger.isTraceEnabled() && oExecutions > 1) mLogger.trace("Retry #{}", oExecutions-1);
+				return pCallable.call();
 			} catch (Exception e) {
-				if (!mRetryCondition.shouldRetry(pCommand, oExecutions, e)) throw e;
-				mBackoffStrategy.pauseBeforeNextRetry(pCommand, oExecutions, e);
+				if (mLogger.isTraceEnabled()) mLogger.trace("Got an exception: {}...", e.getMessage());
+				if (!mRetryCondition.shouldRetry(pCallable, oExecutions, e)) {
+					if (mLogger.isTraceEnabled()) mLogger.trace("...no retrying.");
+					throw e;
+				}
+				if (mLogger.isTraceEnabled()) mLogger.trace("...retrying. Pausing before next retry...");
+				mBackoffStrategy.pauseBeforeNextRetry(pCallable, oExecutions, e);
 			}
 		}
 	}

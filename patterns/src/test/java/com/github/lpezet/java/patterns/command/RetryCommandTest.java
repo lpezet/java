@@ -28,6 +28,7 @@ package com.github.lpezet.java.patterns.command;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class RetryCommandTest {
 	
 	private static class NoOpBackoffStrategy implements IBackoffStrategy {
 		@Override
-		public <T> void pauseBeforeNextRetry(ICommand<T> pCommand, int pExecutions, Throwable pLastException) {
+		public <T> void pauseBeforeNextRetry(Callable<T> pCallable, int pExecutions, Throwable pLastException) {
 			// nop
 		}
 	}
@@ -61,7 +62,7 @@ public class RetryCommandTest {
 		}
 		
 		@Override
-		public <T> boolean shouldRetry(ICommand<T> pCommand, int pExecutions, Throwable pException) {
+		public <T> boolean shouldRetry(Callable<T> pCallable, int pExecutions, Throwable pException) {
 			return pExecutions <= mMaxExecutions && mRetryExceptionClass.isAssignableFrom(pException.getClass());
 		}
 	}
@@ -69,7 +70,7 @@ public class RetryCommandTest {
 	@Test
 	public void noRetry() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		ICommand<Void> oTestCommand = new ICommand<Void>() {
+		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
 			@Override
 			public Void execute() throws Exception {
 				oExecutions.incrementAndGet();
@@ -90,7 +91,7 @@ public class RetryCommandTest {
 	@Test
 	public void retry() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		ICommand<Void> oTestCommand = new ICommand<Void>() {
+		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
 			@Override
 			public Void execute() throws Exception {
 				int oExecs = oExecutions.incrementAndGet();
@@ -113,7 +114,7 @@ public class RetryCommandTest {
 	@Test(expected=IOException.class)
 	public void retryAndFail() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		ICommand<Void> oTestCommand = new ICommand<Void>() {
+		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
 			@Override
 			public Void execute() throws Exception {
 				oExecutions.incrementAndGet();
