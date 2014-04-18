@@ -8,17 +8,17 @@ Some are variations of well-known ones (e.g. Command Pattern), some are much-les
 Documentation
 -------------
 
-### Command<T> Pattern
+### Command&lt;T&gt; Pattern
 This is variation of the famous behavorial Command Pattern from GoF.
 This pattern have commands return a result. This provide some extra benefits over the standard pattern.
 The [AsyncCommand] for example allow a client to execute a command and choose how to get the results in an async fashion: either through a "pull" (*Future*) or through a "push" (*Callback*).
 
 For more info, see [Command Patterns](http://mezzetin.blogspot.com/2014/03/execute-retry-trip.html).
 
-### Activity<T>
-This is (yet) another variation of the standard Command Pattern. It's half Command<T> Pattern, half ANdroid's Activity class.
+### Activity&lt;T&gt; Pattern
+This is (yet) another variation of the standard Command Pattern. It's half Command&lt;T&gt; Pattern, half Android's Activity class.
 This component not only returns a result, but it takes one argument as well.
-This design allows for more reusability over the Command<T> Pattern.
+This design allows for more reusability over the Command&lt;T&gt; Pattern.
 
 For more info, see [Activity Pattern](http://mezzetin.blogspot.com/TODO).
 
@@ -78,4 +78,4 @@ Installation
 License
 -------
 
-See [LICENSE](LICENSE) file.
+See [LICENSE](src/main/resources/META-INF/LICENSE) file.
