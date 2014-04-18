@@ -8,12 +8,10 @@
 	<distributionManagement>
 		<repository>
 			<id>lpezet-release</id>
-			<name>USAT Release</name>
 			<url>dav:https://repository-lpezet.forge.cloudbees.com/release/</url>
 		</repository>
 		<snapshotRepository>
 			<id>lpezet-snapshot</id>
-			<name>USAT Snapshot</name>
 			<url>dav:https://repository-lpezet.forge.cloudbees.com/snapshot/</url>
 		</snapshotRepository>
 	</distributionManagement>
