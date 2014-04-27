@@ -28,6 +28,10 @@ package com.github.lpezet.java.patterns.retry;
 import java.util.concurrent.Callable;
 
 /**
+ * Inspired by: com.amazonaws.retry.RetryPolicy
+ * 
+ * @see <a href="http://grepcode.com/file/repo1.maven.org/maven2/com.amazonaws/aws-java-sdk/1.6.7/com/amazonaws/retry/RetryPolicy.java#RetryPolicy.BackoffStrategy">Backoff Strategy @ AWS</a>
+ * 
  * @author luc
  *
  */

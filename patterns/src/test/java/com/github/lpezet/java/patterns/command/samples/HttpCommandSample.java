@@ -23,7 +23,7 @@
 /**
  * 
  */
-package com.github.lpezet.java.patterns.samples;
+package com.github.lpezet.java.patterns.command.samples;
 
 import static org.mockito.Mockito.when;
 
@@ -109,7 +109,7 @@ public class HttpCommandSample {
 			}
 		};
 		HttpCommand oHttpCommand = new HttpCommand(oHttpClient, oHttpRequest, oCallback);
-		IRetryStrategy oRetryStrategy = RetryStrategies.getDefaultBackoffIORetryStrategy();
+		IRetryStrategy oRetryStrategy = RetryStrategies.defaultBackoffIORetryStrategy();
 		RetryCommand<Void> oRetry = new RetryCommand<Void>(oHttpCommand, oRetryStrategy);
 		
 		ICircuitBreakerStrategy oCircuiteBreakerStrategy = CircuitBreakerStrategies.newSingleTryCircuitBreakerStrategy(); 

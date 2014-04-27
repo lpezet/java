@@ -23,7 +23,7 @@
 /**
  * 
  */
-package com.github.lpezet.java.patterns.command;
+package com.github.lpezet.java.patterns.worker;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -44,7 +44,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.InMemoryCircuitBreaker;
  * @author luc
  * 
  */
-public class CircuitBreakerCommandTest {
+public class CircuitBreakerWorkerTest {
 	
 	private ICircuitBreaker mCircuitBreaker;
 	private ICircuitBreakerHandler mCircuitBreakerHandler;
@@ -60,47 +60,52 @@ public class CircuitBreakerCommandTest {
 					T oResult = pCallable.call();
 					pCircuitBreaker.reset();
 					return oResult;
-				} finally {}
+				} finally {
+				}
 			}
 		};
 		mCircuitBreakerStrategy = new BaseCircuitBreakerStrategy(mCircuitBreaker, mCircuitBreakerHandler);
 	}
+	
 
 	@Test
 	public void noTrip() throws Exception {
-		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
+		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
 			@Override
-			public Void execute() throws Exception {
+			public IResult perform(IWork pWork) throws Exception {
 				return null;
 			}
 		};
-		CircuitBreakerCommand<Void> oCBCommand = new CircuitBreakerCommand<Void>(oTestCommand, mCircuitBreakerStrategy);
-		oCBCommand.execute();
+
+		CircuitBreakerWorker<IWork, IResult> oWorker = new CircuitBreakerWorker<IWork, IResult>(oTestWorker, mCircuitBreakerStrategy);
+		
+		oWorker.perform(null);
 		assertTrue(mCircuitBreaker.isClosed());
 	}
 	
 	@Test
 	public void tripThenReset() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		ICommand<Void> oTestCommand = new BaseCommand<Void>() {
+		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
 			@Override
-			public Void execute() throws Exception {
+			public IResult perform(IWork pWork) throws Exception {
 				int oExecs = oExecutions.incrementAndGet();
-				if (oExecs <= 2) throw new Exception();
+				if (oExecs <= 2) throw new Exception("Throwing exception under 3 executions. This is for testing purposes.");
 				return null;
 			}
 		};
-		CircuitBreakerCommand<Void> oCBCommand = new CircuitBreakerCommand<Void>(oTestCommand, mCircuitBreakerStrategy);
+
+		CircuitBreakerWorker<IWork, IResult> oWorker = new CircuitBreakerWorker<IWork, IResult>(oTestWorker, mCircuitBreakerStrategy);
 		
 		try {
-			oCBCommand.execute();
+			oWorker.perform(null);
 		} catch (Throwable t) {}
 		assertFalse(mCircuitBreaker.isClosed());
 		try {
-			oCBCommand.execute();
+			oWorker.perform(null);
 		} catch (Throwable t) {}
 		assertFalse(mCircuitBreaker.isClosed());
-		oCBCommand.execute();
+		oWorker.perform(null);
 		assertTrue(mCircuitBreaker.isClosed());
 		
 	}

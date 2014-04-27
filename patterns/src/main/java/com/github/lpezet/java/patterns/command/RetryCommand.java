@@ -25,6 +25,9 @@
  */
 package com.github.lpezet.java.patterns.command;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
 
 /**
@@ -32,6 +35,8 @@ import com.github.lpezet.java.patterns.retry.IRetryStrategy;
  *
  */
 public class RetryCommand<T> extends BaseCommand<T> {
+	
+	private Logger mLogger = LoggerFactory.getLogger(RetryCommand.class);
 	
 	private ICommand<T> mImpl;
 	private IRetryStrategy mRetryStrategy;
@@ -43,6 +48,7 @@ public class RetryCommand<T> extends BaseCommand<T> {
 
 	@Override
 	public T execute() throws Exception {
+		if (mLogger.isTraceEnabled()) mLogger.trace(mRetryStrategy + ".executeAndRetry(" + mImpl + ")...");
 		return mRetryStrategy.executeAndRetry(mImpl);
 	}
 	

@@ -30,6 +30,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.lpezet.java.patterns.worker.AsyncWorkerTest;
 
 /**
  * @author luc
@@ -37,49 +41,51 @@ import org.junit.Test;
  */
 public class AsyncCommandTest {
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncWorkerTest.class);
+	
 	private static class MyCommand extends BaseCommand<Integer> {
 		private Random mRandom = new Random();
 		
 		@Override
 		public Integer execute() throws Exception {
+			LOGGER.info("Simulating work (i.e. sleeping)...");
 			Thread.sleep(mRandom.nextInt(30) * 100);
-			return mRandom.nextInt();
+			LOGGER.info("Done working! (i.e. just woke up!!).");
+			return mRandom.nextInt(50);
 		}
 	}
 
 	@Test
-	public void callback() throws Exception {
+	public void pushResults() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
 		MyCommand oImpl = new MyCommand();
 		AsyncCommand<Integer> oAdvCmd = new AsyncCommand<Integer>(oExecutorService, oImpl);
 		Callback<Integer> oCallback = new Callback<Integer>() {
 			@Override
 			public void onResult(Integer pResult) {
-				System.out.println(Thread.currentThread().getName() + " : callback(" + pResult + ").");
-				
+				LOGGER.info("Got result: " + pResult + ".");
 			}
 			@Override
 			public void onException(Exception e) {
-				System.err.println("Got exception!");
-				e.printStackTrace(System.err);
+				LOGGER.error("Got exception!", e);
 			}
 		};
 		IAsyncResult<Integer> oResultHolder = oAdvCmd.execute();
 		oResultHolder.setCallback(oCallback);
-		System.out.println(Thread.currentThread().getName() + ": could do something here...");
+		LOGGER.info("Could do something here while work is being peformed...");
 		oResultHolder.get(); // Called here only to make sure the callback has been called. Could put thread to sleep too.
-		System.out.println(Thread.currentThread().getName() + ": done waiting.");
+		LOGGER.info("All done.");
 	}
 	
 	@Test
-	public void future() throws Exception {
+	public void pullResults() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
 		MyCommand oImpl = new MyCommand();
 		AsyncCommand<Integer> oAdvCmd = new AsyncCommand<Integer>(oExecutorService, oImpl);
 		IAsyncResult<Integer> oResultHolder = oAdvCmd.execute();
-		System.out.println(Thread.currentThread().getName() + ": could do something here...");
+		LOGGER.info("Could do something here while work is being peformed...");
 		Integer oFinalResult = oResultHolder.get();
-		System.out.println(Thread.currentThread().getName() + ": done waiting: " + oFinalResult);
+		LOGGER.info("All done. Final Result = " + oFinalResult);
 	}
 	
 	

@@ -32,13 +32,21 @@ public class Supervisor<T> {
 	}
 	
 	public T supervise(final Callable<T> pCallable) throws Exception {
+		if (mLogger.isTraceEnabled()) mLogger.trace("supervise(" + pCallable + "), timeout=" + mTimeout + ", unit=" + mTimeoutUnit);
 		final CountDownLatch oCountdown = new CountDownLatch(1);
 		Future<T> f = mExecutorService.submit(new Callable<T>() {
 			@Override
 			public T call() throws Exception {
+				try {
 				T oResult = pCallable.call();
 				oCountdown.countDown();
+				System.out.println("Returning result......");
 				return oResult;
+				} catch (Exception e) {
+					//e.printStackTrace();
+					mLogger.error("Unexpected error.", e);
+					throw e;
+				}
 			}
 		});
 		try {
@@ -48,7 +56,7 @@ public class Supervisor<T> {
 				abort(pCallable);
 				throw new TimeoutException();
 			} else {
-				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result.");
+				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result." + f.isDone());
 				return f.get();
 			}
 		} catch (InterruptedException e) {

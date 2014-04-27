@@ -1,12 +1,8 @@
-/**
- * 
- */
-package com.github.lpezet.java.patterns.samples;
+package com.github.lpezet.java.patterns.worker.samples;
 
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Random;
 
 import org.apache.http.HttpResponse;
@@ -21,51 +17,50 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.github.lpezet.java.patterns.activity.CircuitBreakerActivity;
-import com.github.lpezet.java.patterns.activity.IActivity;
-import com.github.lpezet.java.patterns.activity.IContext;
-import com.github.lpezet.java.patterns.activity.RetryActivity;
 import com.github.lpezet.java.patterns.circuitbreaker.CircuitBreakerStrategies;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
 import com.github.lpezet.java.patterns.retry.RetryStrategies;
+import com.github.lpezet.java.patterns.worker.CircuitBreakerWorker;
+import com.github.lpezet.java.patterns.worker.IResult;
+import com.github.lpezet.java.patterns.worker.IWork;
+import com.github.lpezet.java.patterns.worker.IWorker;
+import com.github.lpezet.java.patterns.worker.RetryWorker;
 
-/**
- * @author luc
- *
- */
-public class HttpActivitySample {
+public class HttpWorkerSample {
+	
+	static class HttpWork implements IWork {
+		private HttpUriRequest mRequest;
+		public HttpWork(HttpUriRequest pRequest) {
+			mRequest = pRequest;
+		}
+		public HttpUriRequest getRequest() {
+			return mRequest;
+		}
+	}
+	
+	static class HttpResult implements IResult {
+		private HttpResponse mResponse;
+		public HttpResult(HttpResponse pResponse) {
+			mResponse = pResponse;
+		}
+		public HttpResponse getResponse() {
+			return mResponse;
+		}
+	}
 
-	static class HttpActivity implements IActivity<HttpResponse> {
+	static class HttpWorker implements IWorker<HttpWork, HttpResult> {
 		
 		private HttpClient mClient;
 		
-		public HttpActivity(HttpClient pClient) {
+		public HttpWorker(HttpClient pClient) {
 			mClient = pClient;
 		}
 		
 		@Override
-		public HttpResponse start(IContext pContext) throws Exception {
-			IHttpContext oCtxt = (IHttpContext) pContext;
-			return mClient.execute(oCtxt.getRequest());
-		}
-	}
-	
-	static interface IHttpContext extends IContext {
-		HttpUriRequest getRequest();
-	}
-	
-	static class HttpContext implements IHttpContext {
-		
-		private HttpUriRequest mRequest;
-		
-		public HttpContext(HttpUriRequest pRequest) {
-			mRequest = pRequest;
-		}
-		
-		@Override
-		public HttpUriRequest getRequest() {
-			return mRequest;
+		public HttpResult perform(HttpWork pWork) throws Exception {
+			HttpResponse oResponse = mClient.execute(pWork.getRequest());
+			return new HttpResult(oResponse);
 		}
 	}
 	
@@ -79,26 +74,25 @@ public class HttpActivitySample {
 			public HttpResponse answer(InvocationOnMock pInvocation) throws Throwable {
 				mWeight++;
 				int oRnd = mRnd.nextInt(1000);
-				if (oRnd >= (1000 - mWeight * 250)) {
+				int oThreshold = (1000 - mWeight * 250);
+				//System.out.println("Rnd = " + oRnd + ", Threshold = " + oThreshold);
+				if (oRnd >= oThreshold) {
 					mWeight = (mRnd.nextInt(10) >= 2) ? 0 : mWeight - 1;
 					throw new IOException();
 				}
 				return new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 1, 1), 200, null));
 			}
 		});
-		HttpActivity oActivity = new HttpActivity(oHttpClient);
-		IRetryStrategy oRetryStrategy = RetryStrategies.getDefaultBackoffIORetryStrategy();
-		RetryActivity<HttpResponse> oRetry = new RetryActivity<HttpResponse>(oActivity, oRetryStrategy);
+		HttpWorker oWorker = new HttpWorker(oHttpClient);
+		IRetryStrategy oRetryStrategy = RetryStrategies.defaultBackoffIORetryStrategy();
+		RetryWorker<HttpWork, HttpResult> oRetry = new RetryWorker<HttpWork,HttpResult>(oWorker, oRetryStrategy);
 		
 		ICircuitBreakerStrategy oCircuiteBreakerStrategy = CircuitBreakerStrategies.newSingleTryCircuitBreakerStrategy();
-		CircuitBreakerActivity<HttpResponse> oCB = new CircuitBreakerActivity<HttpResponse>(oRetry, oCircuiteBreakerStrategy);
-		HttpGet oGet = new HttpGet();
-		HttpContext oCtxt = new HttpContext(oGet);
+		CircuitBreakerWorker<HttpWork, HttpResult> oCB = new CircuitBreakerWorker<HttpWork, HttpResult>(oRetry, oCircuiteBreakerStrategy);
 		for (int i = 0; i < 25; i++) {
 			try {
 				Thread.sleep(70);
-				oGet.setURI(new URI("http://test.com/" + i));
-				oCB.start(oCtxt);
+				oCB.perform( new HttpWork(new HttpGet("http://something.com/" + i)));
 				System.out.println(i + ": Executed!");
 			} catch (Throwable t) {
 				System.out.println(i + " : Got an exception: " + t.getClass().getName());
