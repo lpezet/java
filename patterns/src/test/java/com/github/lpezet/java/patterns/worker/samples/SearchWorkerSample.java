@@ -13,9 +13,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.lpezet.java.patterns.worker.IResult;
 import com.github.lpezet.java.patterns.worker.IResultMerger;
-import com.github.lpezet.java.patterns.worker.IWork;
 import com.github.lpezet.java.patterns.worker.IWorkSplitter;
 import com.github.lpezet.java.patterns.worker.IWorker;
 import com.github.lpezet.java.patterns.worker.SimpleSPMWorker;
@@ -29,7 +27,7 @@ public class SearchWorkerSample {
 	/**
 	 * Wrapping domain parameter into IWork
 	 */
-	private static class SearchWork implements IWork {
+	private static class SearchWork {
 		private SearchParameters mParameters;
 		public SearchWork(SearchParameters pParameters) {
 			mParameters = pParameters;
@@ -42,7 +40,7 @@ public class SearchWorkerSample {
 	/**
 	 * Wrapping domain result into IResult
 	 */
-	private static class SearchResult implements IResult {
+	private static class SearchResult {
 		private SearchResults mResults;
 		public SearchResult(SearchResults pResults) {
 			mResults = pResults;

@@ -15,12 +15,13 @@ The [AsyncCommand] for example allow a client to execute a command and choose ho
 
 For more info, see [Command Patterns](http://mezzetin.blogspot.com/2014/03/execute-retry-trip.html).
 
-### Activity&lt;T&gt; Pattern
-This is (yet) another variation of the standard Command Pattern. It's half Command&lt;T&gt; Pattern, half Android's Activity class.
-This component not only returns a result, but it takes one argument as well.
-This design allows for more reusability over the Command&lt;T&gt; Pattern.
+### Worker Pattern
+This is (yet) another variation of the standard Command Pattern. It's a Command with a parameter and a result.
+This design allows for:
+- more re-usability over the Command&lt;T&gt; Pattern.
+- and chaining.
 
-For more info, see [Activity Pattern](http://mezzetin.blogspot.com/TODO).
+For more info, see [Worker Pattern](http://mezzetin.blogspot.com/TODO).
 
 ### Retry Pattern
 This pattern provides a flexible approach to retrying execution of code.

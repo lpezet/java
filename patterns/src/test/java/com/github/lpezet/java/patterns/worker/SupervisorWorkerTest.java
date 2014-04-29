@@ -18,7 +18,7 @@ import com.github.lpezet.java.patterns.supervisor.TimeoutException;
  */
 public class SupervisorWorkerTest {
 	
-	private static class IntegerResult implements IResult {
+	private static class IntegerResult {
 		private int mResult;
 		public IntegerResult(int pResult) {
 			mResult = pResult;
@@ -30,26 +30,26 @@ public class SupervisorWorkerTest {
 	
 	@Test(expected=TimeoutException.class)
 	public void failFast() throws Exception {
-		IWorker<IWork, IResult> oWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				Thread.sleep(100);
 				return null;
 			}
 		};
-		SupervisorWorker<IWork, IResult> s = new SupervisorWorker<IWork, IResult>(oWorker, 50, TimeUnit.MILLISECONDS);
+		SupervisorWorker<Void, Void> s = new SupervisorWorker<Void, Void>(oWorker, 50, TimeUnit.MILLISECONDS);
 		s.perform(null);
 	}
 	
 	@Test
 	public void succeed() throws Exception {
-		IWorker<IWork, IntegerResult> oWorker = new IWorker<IWork, IntegerResult>() {
+		IWorker<Void, IntegerResult> oWorker = new IWorker<Void, IntegerResult>() {
 			@Override
-			public IntegerResult perform(IWork pWork) throws Exception {
+			public IntegerResult perform(Void pWork) throws Exception {
 				return new IntegerResult(987);
 			}
 		};
-		SupervisorWorker<IWork, IntegerResult> s = new SupervisorWorker<IWork, IntegerResult>(oWorker, 100, TimeUnit.MILLISECONDS);
+		SupervisorWorker<Void, IntegerResult> s = new SupervisorWorker<Void, IntegerResult>(oWorker, 100, TimeUnit.MILLISECONDS);
 		IntegerResult oActual = s.perform(null);
 		assertNotNull(oActual);
 		assertEquals(987, oActual.getResult());

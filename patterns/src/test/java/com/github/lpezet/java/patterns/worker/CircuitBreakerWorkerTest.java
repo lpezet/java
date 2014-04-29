@@ -70,14 +70,14 @@ public class CircuitBreakerWorkerTest {
 
 	@Test
 	public void noTrip() throws Exception {
-		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oTestWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				return null;
 			}
 		};
 
-		CircuitBreakerWorker<IWork, IResult> oWorker = new CircuitBreakerWorker<IWork, IResult>(oTestWorker, mCircuitBreakerStrategy);
+		CircuitBreakerWorker<Void, Void> oWorker = new CircuitBreakerWorker<Void, Void>(oTestWorker, mCircuitBreakerStrategy);
 		
 		oWorker.perform(null);
 		assertTrue(mCircuitBreaker.isClosed());
@@ -86,16 +86,16 @@ public class CircuitBreakerWorkerTest {
 	@Test
 	public void tripThenReset() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oTestWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				int oExecs = oExecutions.incrementAndGet();
 				if (oExecs <= 2) throw new Exception("Throwing exception under 3 executions. This is for testing purposes.");
 				return null;
 			}
 		};
 
-		CircuitBreakerWorker<IWork, IResult> oWorker = new CircuitBreakerWorker<IWork, IResult>(oTestWorker, mCircuitBreakerStrategy);
+		CircuitBreakerWorker<Void, Void> oWorker = new CircuitBreakerWorker<Void, Void>(oTestWorker, mCircuitBreakerStrategy);
 		
 		try {
 			oWorker.perform(null);

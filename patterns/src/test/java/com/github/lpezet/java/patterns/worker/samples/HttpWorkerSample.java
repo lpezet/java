@@ -22,14 +22,12 @@ import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
 import com.github.lpezet.java.patterns.retry.RetryStrategies;
 import com.github.lpezet.java.patterns.worker.CircuitBreakerWorker;
-import com.github.lpezet.java.patterns.worker.IResult;
-import com.github.lpezet.java.patterns.worker.IWork;
 import com.github.lpezet.java.patterns.worker.IWorker;
 import com.github.lpezet.java.patterns.worker.RetryWorker;
 
 public class HttpWorkerSample {
 	
-	static class HttpWork implements IWork {
+	static class HttpWork {
 		private HttpUriRequest mRequest;
 		public HttpWork(HttpUriRequest pRequest) {
 			mRequest = pRequest;
@@ -39,7 +37,7 @@ public class HttpWorkerSample {
 		}
 	}
 	
-	static class HttpResult implements IResult {
+	static class HttpResult {
 		private HttpResponse mResponse;
 		public HttpResult(HttpResponse pResponse) {
 			mResponse = pResponse;

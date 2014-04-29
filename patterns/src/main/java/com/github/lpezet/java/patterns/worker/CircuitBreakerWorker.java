@@ -11,7 +11,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
  * @author luc
  *
  */
-public class CircuitBreakerWorker<W extends IWork, R extends IResult> implements IWorker<W, R> {
+public class CircuitBreakerWorker<W, R> implements IWorker<W, R> {
 
 	private IWorker<W, R> mImpl;
 	private ICircuitBreakerStrategy mCircuitBreakerStrategy;

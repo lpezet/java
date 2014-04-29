@@ -25,7 +25,7 @@ public class Workers {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Workers.class); 
 	
-	private static class WorkerInvocationHandler<S extends IWorker<W, R>, W extends IWork, R extends IResult> implements InvocationHandler {
+	private static class WorkerInvocationHandler<S extends IWorker<W, R>, W, R> implements InvocationHandler {
 		
 		private static final String EXECUTE = "perform";
 		private IWorker<W, R> mDelegate;
@@ -38,7 +38,7 @@ public class Workers {
 		
 		@Override
 		public Object invoke(Object pProxy, Method pMethod, Object[] pArgs) throws Throwable {
-			if (EXECUTE.equalsIgnoreCase(pMethod.getName()) && pArgs.length == 1 && (pArgs[0] instanceof IWork) ) {
+			if (EXECUTE.equalsIgnoreCase(pMethod.getName()) && pArgs.length == 1 ) {
 				if (LOGGER.isTraceEnabled()) LOGGER.trace(pProxy.getClass().getName() + "." + pMethod.getName() + "(" + pArgs + ") --> " + mDelegate + ".perform(" + pArgs + ").");
 				return mDelegate.perform((W) pArgs[0]);
 			} else {
@@ -48,7 +48,7 @@ public class Workers {
 		}
 	}
 
-	public static <S extends IWorker<W,R>, W extends IWork, R extends IResult> S retry(S pSource, IRetryStrategy pRetryStrategy) {
+	public static <S extends IWorker<W,R>, W, R> S retry(S pSource, IRetryStrategy pRetryStrategy) {
 		RetryWorker<W, R> r = new RetryWorker<W, R>(pSource, pRetryStrategy);
 		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, r);
 		S oResult = (S) Proxy.newProxyInstance(Workers.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);
@@ -68,7 +68,7 @@ public class Workers {
 		return oInterfaces.toArray(new Class[] {});
 	}
 
-	public static <S extends IWorker<W,R>, W extends IWork, R extends IResult> S supervise(S pSource, long pTimeout, TimeUnit pUnit) {
+	public static <S extends IWorker<W,R>, W, R> S supervise(S pSource, long pTimeout, TimeUnit pUnit) {
 		SupervisorWorker<W, R> s = new SupervisorWorker<W, R>(pSource, pTimeout, pUnit);
 		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, s);
 		S oResult = (S) Proxy.newProxyInstance(Commands.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);
@@ -76,7 +76,7 @@ public class Workers {
 		return oResult;
 	}
 	
-	public static <S extends IWorker<W,R>, W extends IWork, R extends IResult> S circuitBreaker(S pSource, ICircuitBreakerStrategy pStrategy) {
+	public static <S extends IWorker<W,R>, W, R> S circuitBreaker(S pSource, ICircuitBreakerStrategy pStrategy) {
 		CircuitBreakerWorker<W, R> c = new CircuitBreakerWorker<W, R>(pSource, pStrategy);
 		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, c);
 		S oResult = (S) Proxy.newProxyInstance(Commands.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);

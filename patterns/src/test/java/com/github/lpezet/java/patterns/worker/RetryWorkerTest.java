@@ -60,14 +60,14 @@ public class RetryWorkerTest {
 	@Test
 	public void noRetry() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oTestWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				oExecutions.incrementAndGet();
 				return null;
 			}
 		};
-		RetryWorker<IWork, IResult> oRetry = new RetryWorker<IWork, IResult>(oTestWorker, mRetryStrategy);
+		RetryWorker<Void, Void> oRetry = new RetryWorker<Void, Void>(oTestWorker, mRetryStrategy);
 		oRetry.perform(null);
 		assertEquals(1, oExecutions.get());
 	}
@@ -75,15 +75,15 @@ public class RetryWorkerTest {
 	@Test
 	public void retry() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oTestWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				int oExecs = oExecutions.incrementAndGet();
 				if (oExecs <= 2) throw new IOException("Throwing exception under 3 executions. This is for testing purposes.");
 				return null;
 			}
 		};
-		RetryWorker<IWork, IResult> oRetry = new RetryWorker<IWork, IResult>(oTestWorker, mRetryStrategy);
+		RetryWorker<Void, Void> oRetry = new RetryWorker<Void, Void>(oTestWorker, mRetryStrategy);
 		oRetry.perform(null);
 		assertEquals(3, oExecutions.get());
 	}
@@ -91,14 +91,14 @@ public class RetryWorkerTest {
 	@Test(expected=IOException.class)
 	public void retryAndFail() throws Exception {
 		final AtomicInteger oExecutions = new AtomicInteger(0);
-		IWorker<IWork, IResult> oTestWorker = new IWorker<IWork, IResult>() {
+		IWorker<Void, Void> oTestWorker = new IWorker<Void, Void>() {
 			@Override
-			public IResult perform(IWork pWork) throws Exception {
+			public Void perform(Void pWork) throws Exception {
 				oExecutions.incrementAndGet();
 				throw new IOException("Throwing exception all the time. This is for testing purposes."); 
 			}
 		};
-		RetryWorker<IWork, IResult> oRetry = new RetryWorker<IWork, IResult>(oTestWorker, mRetryStrategy);
+		RetryWorker<Void, Void> oRetry = new RetryWorker<Void, Void>(oTestWorker, mRetryStrategy);
 		try {
 			oRetry.perform(null);
 		} finally {

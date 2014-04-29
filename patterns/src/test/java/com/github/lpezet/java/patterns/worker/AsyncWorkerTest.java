@@ -20,7 +20,7 @@ public class AsyncWorkerTest {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncWorkerTest.class);
 	
-	private static class IntegerResult implements IResult {
+	private static class IntegerResult {
 		private int mResult;
 		public IntegerResult(int pResult) {
 			mResult = pResult;
@@ -30,10 +30,10 @@ public class AsyncWorkerTest {
 		}
 	}
 
-	private static class MyWorker implements IWorker<IWork, IntegerResult> {
+	private static class MyWorker implements IWorker<Void, IntegerResult> {
 		private Random mRandom = new Random();
 		@Override
-		public IntegerResult perform(IWork pWork) throws Exception {
+		public IntegerResult perform(Void pWork) throws Exception {
 			LOGGER.info("Simulating work (i.e. sleeping)...");
 			Thread.sleep(mRandom.nextInt(30) * 100);
 			LOGGER.info("Done working! (i.e. just woke up!!).");
@@ -45,7 +45,7 @@ public class AsyncWorkerTest {
 	public void pushResults() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
 		MyWorker oImpl = new MyWorker();
-		AsyncWorker<IWork, IntegerResult> oWorker = new AsyncWorker<IWork, IntegerResult>(oExecutorService, oImpl);
+		AsyncWorker<Void, IntegerResult> oWorker = new AsyncWorker<Void, IntegerResult>(oExecutorService, oImpl);
 		Callback<IntegerResult> oCallback = new Callback<IntegerResult>() {
 			@Override
 			public void onResult(IntegerResult pResult) {
@@ -67,7 +67,7 @@ public class AsyncWorkerTest {
 	public void pullResults() throws Exception {
 		ExecutorService oExecutorService = Executors.newFixedThreadPool(3);
 		MyWorker oImpl = new MyWorker();
-		AsyncWorker<IWork, IntegerResult> oWorker = new AsyncWorker<IWork, IntegerResult>(oExecutorService, oImpl);
+		AsyncWorker<Void, IntegerResult> oWorker = new AsyncWorker<Void, IntegerResult>(oExecutorService, oImpl);
 		IAsyncResult<IntegerResult> oResultHolder = oWorker.perform(null);
 		LOGGER.info("Could do something here while work is being peformed...");
 		IntegerResult oFinalResult = oResultHolder.get();

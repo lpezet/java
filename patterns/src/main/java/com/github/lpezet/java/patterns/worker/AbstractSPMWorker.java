@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
  * @author luc
  *
  */
-public abstract class AbstractSPMWorker<W extends IWork, R extends IResult> implements IWorker<W, R> {
+public abstract class AbstractSPMWorker<W, R> implements IWorker<W, R> {
 
 	private IWorkSplitter<W> mSplitter;
 	private IResultMerger<R> mMerger;

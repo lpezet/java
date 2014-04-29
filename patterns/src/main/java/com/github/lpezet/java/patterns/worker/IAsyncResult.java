@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * @author luc
  *
  */
-public interface IAsyncResult<R extends IResult> extends IResult {
+public interface IAsyncResult<R> {
 
 	/**
 	 * Set "method" to be called when result is available.

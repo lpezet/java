@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
  * @author luc
  *
  */
-public class SimpleSPMWorker<W extends IWork, R extends IResult> extends AbstractSPMWorker<W, R> {
+public class SimpleSPMWorker<W, R> extends AbstractSPMWorker<W, R> {
 	
 	private IWorker<W, R> mImpl;
 	

@@ -14,7 +14,7 @@ import com.github.lpezet.java.patterns.supervisor.Supervisor;
  * @author luc
  *
  */
-public class SupervisorWorker<W extends IWork, R extends IResult> implements IWorker<W, R> {
+public class SupervisorWorker<W, R> implements IWorker<W, R> {
 
 	private IWorker<W, R> mImpl;
 	private Supervisor<R> mSupervisor;

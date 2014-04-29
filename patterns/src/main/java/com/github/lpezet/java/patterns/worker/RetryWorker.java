@@ -11,7 +11,7 @@ import com.github.lpezet.java.patterns.retry.IRetryStrategy;
  * @author luc
  *
  */
-public class RetryWorker<W extends IWork, R extends IResult> implements IWorker<W, R> {
+public class RetryWorker<W, R> implements IWorker<W, R> {
 
 	private IWorker<W, R> mImpl;
 	private IRetryStrategy mRetryStrategy;

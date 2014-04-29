@@ -18,7 +18,7 @@ public class Splitters {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Splitters.class);
 
-	public static interface ISimpleSplitter<W extends IWork> {
+	public static interface ISimpleSplitter<W> {
 		public int count(W pWork);
 		public W newSplit(int pFrom, int pTo, W pWork);
 	}
@@ -30,7 +30,7 @@ public class Splitters {
 	 * @param pSplitter
 	 * @return
 	 */
-	public static <T extends IWork> IWorkSplitter<T> splitByChunkSize(final int pChunkSize, final ISimpleSplitter<T> pSplitter) {
+	public static <T> IWorkSplitter<T> splitByChunkSize(final int pChunkSize, final ISimpleSplitter<T> pSplitter) {
 		return new IWorkSplitter<T>() {
 			@Override
 			public Collection<T> split(T pWork) {
@@ -63,7 +63,7 @@ public class Splitters {
 	 * @param pSplitter
 	 * @return
 	 */
-	public static <T extends IWork> IWorkSplitter<T> splitByChunks(final int pChunks, final int pMinChunkSize, final ISimpleSplitter<T> pSplitter) {
+	public static <T> IWorkSplitter<T> splitByChunks(final int pChunks, final int pMinChunkSize, final ISimpleSplitter<T> pSplitter) {
 		return new IWorkSplitter<T>() {
 			@Override
 			public Collection<T> split(T pWork) {

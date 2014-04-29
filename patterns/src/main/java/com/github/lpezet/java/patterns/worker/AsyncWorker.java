@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
  * @author luc
  *
  */
-public class AsyncWorker<W extends IWork, R extends IResult> implements IWorker<W, IAsyncResult<R>> {
+public class AsyncWorker<W, R> implements IWorker<W, IAsyncResult<R>> {
 
 	private ExecutorService mExecutorService;
 	private IWorker<W, R> mImpl;

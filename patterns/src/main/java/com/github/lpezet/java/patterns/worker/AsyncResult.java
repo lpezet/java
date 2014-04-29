@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author luc
  *
  */
-public class AsyncResult<R extends IResult> implements IAsyncResult<R> {
+public class AsyncResult<R> implements IAsyncResult<R> {
 
 	private static class ResultOrException<T> {
 		private T mResult;
@@ -40,7 +40,7 @@ public class AsyncResult<R extends IResult> implements IAsyncResult<R> {
 	/**
 	 * Executes command with custom callable.
 	 */
-	public <T extends IWork> AsyncResult(ExecutorService pExecutorService, final IWorker<T, R> pImpl, final T pWork) {
+	public <T> AsyncResult(ExecutorService pExecutorService, final IWorker<T, R> pImpl, final T pWork) {
 		mFutureResult = pExecutorService.submit(new Callable<ResultOrException<R>>() {
 			@Override
 			public ResultOrException<R> call() throws Exception {
