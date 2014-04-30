@@ -21,7 +21,7 @@ This design allows for:
 - more re-usability over the Command&lt;T&gt; Pattern.
 - and chaining.
 
-For more info, see [Worker Pattern](http://mezzetin.blogspot.com/TODO).
+For more info, see [Worker Pattern](http://mezzetin.blogspot.com/2014/04/worker-pattern.html).
 
 ### Retry Pattern
 This pattern provides a flexible approach to retrying execution of code.
