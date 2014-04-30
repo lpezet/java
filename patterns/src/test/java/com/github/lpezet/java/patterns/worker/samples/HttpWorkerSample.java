@@ -26,28 +26,8 @@ import com.github.lpezet.java.patterns.worker.IWorker;
 import com.github.lpezet.java.patterns.worker.RetryWorker;
 
 public class HttpWorkerSample {
-	
-	static class HttpWork {
-		private HttpUriRequest mRequest;
-		public HttpWork(HttpUriRequest pRequest) {
-			mRequest = pRequest;
-		}
-		public HttpUriRequest getRequest() {
-			return mRequest;
-		}
-	}
-	
-	static class HttpResult {
-		private HttpResponse mResponse;
-		public HttpResult(HttpResponse pResponse) {
-			mResponse = pResponse;
-		}
-		public HttpResponse getResponse() {
-			return mResponse;
-		}
-	}
 
-	static class HttpWorker implements IWorker<HttpWork, HttpResult> {
+	static class HttpWorker implements IWorker<HttpUriRequest, HttpResponse> {
 		
 		private HttpClient mClient;
 		
@@ -56,9 +36,8 @@ public class HttpWorkerSample {
 		}
 		
 		@Override
-		public HttpResult perform(HttpWork pWork) throws Exception {
-			HttpResponse oResponse = mClient.execute(pWork.getRequest());
-			return new HttpResult(oResponse);
+		public HttpResponse perform(HttpUriRequest pWork) throws Exception {
+			return mClient.execute(pWork);
 		}
 	}
 	
@@ -83,14 +62,14 @@ public class HttpWorkerSample {
 		});
 		HttpWorker oWorker = new HttpWorker(oHttpClient);
 		IRetryStrategy oRetryStrategy = RetryStrategies.defaultBackoffIORetryStrategy();
-		RetryWorker<HttpWork, HttpResult> oRetry = new RetryWorker<HttpWork,HttpResult>(oWorker, oRetryStrategy);
+		RetryWorker<HttpUriRequest, HttpResponse> oRetry = new RetryWorker<HttpUriRequest,HttpResponse>(oWorker, oRetryStrategy);
 		
 		ICircuitBreakerStrategy oCircuiteBreakerStrategy = CircuitBreakerStrategies.newSingleTryCircuitBreakerStrategy();
-		CircuitBreakerWorker<HttpWork, HttpResult> oCB = new CircuitBreakerWorker<HttpWork, HttpResult>(oRetry, oCircuiteBreakerStrategy);
+		CircuitBreakerWorker<HttpUriRequest, HttpResponse> oCB = new CircuitBreakerWorker<HttpUriRequest, HttpResponse>(oRetry, oCircuiteBreakerStrategy);
 		for (int i = 0; i < 25; i++) {
 			try {
 				Thread.sleep(70);
-				oCB.perform( new HttpWork(new HttpGet("http://something.com/" + i)));
+				oCB.perform( new HttpGet("http://something.com/" + i) );
 				System.out.println(i + ": Executed!");
 			} catch (Throwable t) {
 				System.out.println(i + " : Got an exception: " + t.getClass().getName());
