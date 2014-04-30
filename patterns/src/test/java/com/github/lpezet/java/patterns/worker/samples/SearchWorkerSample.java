@@ -22,58 +22,31 @@ import com.github.lpezet.java.patterns.worker.Splitters;
 public class SearchWorkerSample {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SearchWorkerSample.class);
-
-	
-	/**
-	 * Wrapping domain parameter into IWork
-	 */
-	private static class SearchWork {
-		private SearchParameters mParameters;
-		public SearchWork(SearchParameters pParameters) {
-			mParameters = pParameters;
-		}
-		public SearchParameters getParameters() {
-			return mParameters;
-		}
-	}
-	
-	/**
-	 * Wrapping domain result into IResult
-	 */
-	private static class SearchResult {
-		private SearchResults mResults;
-		public SearchResult(SearchResults pResults) {
-			mResults = pResults;
-		}
-		public SearchResults getResults() {
-			return mResults;
-		}
-	}
 	
 	/**
 	 * Merger of domain results
 	 */
-	private static class SearchMerger implements IResultMerger<SearchResult> {
+	private static class SearchMerger implements IResultMerger<SearchResults> {
 		@Override
-		public SearchResult merge(Collection<SearchResult> pSource) {
+		public SearchResults merge(Collection<SearchResults> pSource) {
 			List<Integer> oResults = new ArrayList<Integer>();
-			for (SearchResult r : pSource) {
-				oResults.addAll(r.getResults().getResults());
+			for (SearchResults r : pSource) {
+				oResults.addAll(r.getResults());
 			}
-			return new SearchResult(new SearchResults(oResults));
+			return new SearchResults(oResults);
 		}
 	}
 	
 	/**
 	 * Splitter of domain parameter/work.
 	 */
-	private static class SearchSplitter implements IWorkSplitter<SearchWork> {
+	private static class SearchSplitter implements IWorkSplitter<SearchParameters> {
 		
 		private int mChunkSize = 10;
 		
 		@Override
-		public Collection<SearchWork> split(SearchWork pWork) {
-			List<SearchWork> oResult = new ArrayList<SearchWork>();
+		public Collection<SearchParameters> split(SearchParameters pWork) {
+			List<SearchParameters> oResult = new ArrayList<SearchParameters>();
 			int oAmountOfWork = count(pWork); 
 			if (oAmountOfWork < mChunkSize) {
 				LOGGER.debug("Not splitting work: too small.");
@@ -83,22 +56,22 @@ public class SearchWorkerSample {
 				LOGGER.debug("Dividing up work into " + n + " chunks.");
 				int oTo, oFrom;
 				for (int i = 0; i < n; i++) {
-					oFrom = pWork.getParameters().getFrom() + i * mChunkSize;
-					oTo = Math.min(pWork.getParameters().getTo(), oFrom + mChunkSize - 1);
-					oResult.add(new SearchWork(new SearchParameters(oFrom, oTo, pWork.getParameters().getFilters())));
+					oFrom = pWork.getFrom() + i * mChunkSize;
+					oTo = Math.min(pWork.getTo(), oFrom + mChunkSize - 1);
+					oResult.add(new SearchParameters(oFrom, oTo, pWork.getFilters()));
 				}
 			}
 			return oResult;
 		}
-		private int count(SearchWork pWork) {
-			return pWork.getParameters().getTo() - pWork.getParameters().getFrom();
+		private int count(SearchParameters pWork) {
+			return pWork.getTo() - pWork.getFrom();
 		}
 	}
 	
 	/**
 	 * Wrapper on domain searcher.
 	 */
-	private static class SearchWorker implements IWorker<SearchWork, SearchResult> {
+	private static class SearchWorker implements IWorker<SearchParameters, SearchResults> {
 		
 		private Searcher mSearcher;
 		public SearchWorker(Searcher pSearcher) {
@@ -106,8 +79,8 @@ public class SearchWorkerSample {
 		}
 		
 		@Override
-		public SearchResult perform(SearchWork pWork) throws Exception {
-			return new SearchResult( mSearcher.search(pWork.getParameters()) );
+		public SearchResults perform(SearchParameters pWork) throws Exception {
+			return mSearcher.search(pWork);
 		}
 	}
 	
@@ -175,18 +148,18 @@ public class SearchWorkerSample {
 		ExecutorService oES = Executors.newCachedThreadPool();
 		Searcher s = new Searcher();
 		
-		Splitters.ISimpleSplitter<SearchWork> oSplitter = new Splitters.ISimpleSplitter<SearchWork>() {
+		Splitters.ISimpleSplitter<SearchParameters> oSplitter = new Splitters.ISimpleSplitter<SearchParameters>() {
 			@Override
-			public int count(SearchWork pWork) {
-				return pWork.getParameters().getTo() - pWork.getParameters().getFrom();
+			public int count(SearchParameters pWork) {
+				return pWork.getTo() - pWork.getFrom();
 			}
 			@Override
-			public SearchWork newSplit(int pFrom, int pTo, SearchWork pWork) {
-				return new SearchWork(new SearchParameters(pWork.getParameters().getFrom() + pFrom - 1, Math.min(pTo + pWork.getParameters().getFrom() - 1, pWork.getParameters().getTo()), pWork.getParameters().getFilters()));
+			public SearchParameters newSplit(int pFrom, int pTo, SearchParameters pWork) {
+				return new SearchParameters(pWork.getFrom() + pFrom - 1, Math.min(pTo + pWork.getFrom() - 1, pWork.getTo()), pWork.getFilters());
 			}
 		};
 		
-		IWorkSplitter<SearchWork> oSP = Splitters.splitByChunkSize(10, oSplitter);
+		IWorkSplitter<SearchParameters> oSP = Splitters.splitByChunkSize(10, oSplitter);
 		SearchMerger oSM = new SearchMerger();
 		SearchWorker oSW = new SearchWorker(s);
 		
@@ -206,14 +179,14 @@ public class SearchWorkerSample {
 	@Test
 	public void searchWithSPMWorkersUsingSplittersFixedThreads() throws Exception {
 		Searcher s = new Searcher();
-		IWorkSplitter<SearchWork> oSP = Splitters.splitByChunkSize(10, new Splitters.ISimpleSplitter<SearchWork>() {
+		IWorkSplitter<SearchParameters> oSP = Splitters.splitByChunkSize(10, new Splitters.ISimpleSplitter<SearchParameters>() {
 			@Override
-			public int count(SearchWork pWork) {
-				return pWork.getParameters().getTo() - pWork.getParameters().getFrom();
+			public int count(SearchParameters pWork) {
+				return pWork.getTo() - pWork.getFrom();
 			}
 			@Override
-			public SearchWork newSplit(int pFrom, int pTo, SearchWork pWork) {
-				return new SearchWork(new SearchParameters(pWork.getParameters().getFrom() + pFrom - 1, Math.min(pTo + pWork.getParameters().getFrom() - 1, pWork.getParameters().getTo()), pWork.getParameters().getFilters()));
+			public SearchParameters newSplit(int pFrom, int pTo, SearchParameters pWork) {
+				return new SearchParameters(pWork.getFrom() + pFrom - 1, Math.min(pTo + pWork.getFrom() - 1, pWork.getTo()), pWork.getFilters());
 			}
 		});
 		SearchMerger oSM = new SearchMerger();
@@ -226,18 +199,16 @@ public class SearchWorkerSample {
 		}
 	}
 	
-	private void assertWorks(ExecutorService pExecutorService, IWorkSplitter<SearchWork> pSplitter, SearchMerger pMerger, SearchWorker pWorker, SearchParameters pSearchParameters) throws Exception {
-		SimpleSPMWorker<SearchWork, SearchResult> oSPMWorker = new SimpleSPMWorker<SearchWork, SearchResult>(pExecutorService, pSplitter, pMerger, pWorker);
-		SearchWork oWork = new SearchWork(pSearchParameters);
+	private void assertWorks(ExecutorService pExecutorService, IWorkSplitter<SearchParameters> pSplitter, SearchMerger pMerger, SearchWorker pWorker, SearchParameters pSearchParameters) throws Exception {
+		SimpleSPMWorker<SearchParameters, SearchResults> oSPMWorker = new SimpleSPMWorker<SearchParameters, SearchResults>(pExecutorService, pSplitter, pMerger, pWorker);
 		long oStart = System.currentTimeMillis();
-		SearchResult oResults = oSPMWorker.perform(oWork);
+		SearchResults oResults = oSPMWorker.perform(pSearchParameters);
 		long oEnd =  System.currentTimeMillis();
 		int oExpectedTotalResults = pSearchParameters.getTo() - pSearchParameters.getFrom() + 1; 
-		LOGGER.info("Execution time for " + oResults.getResults().getResults().size() + " results: " + (oEnd - oStart) + "ms.");
+		LOGGER.info("Execution time for " + oResults.getResults().size() + " results: " + (oEnd - oStart) + "ms.");
 		assertNotNull(oResults);
 		assertNotNull(oResults.getResults());
-		assertNotNull(oResults.getResults().getResults());
-		assertEquals(oExpectedTotalResults, oResults.getResults().getResults().size());
+		assertEquals(oExpectedTotalResults, oResults.getResults().size());
 		
 		
 	}
