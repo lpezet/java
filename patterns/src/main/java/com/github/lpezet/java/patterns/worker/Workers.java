@@ -69,14 +69,6 @@ public class Workers {
 			}
 		}
 	}
-
-	public static <S extends IWorker<W,R>, W, R> S retry(S pSource, IRetryStrategy pRetryStrategy) {
-		RetryWorker<W, R> r = new RetryWorker<W, R>(pSource, pRetryStrategy);
-		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, r);
-		S oResult = (S) Proxy.newProxyInstance(Workers.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);
-		if (LOGGER.isTraceEnabled()) LOGGER.trace("Created proxy " + oResult.getClass().getName() + " out of " + pSource.getClass().getName() + " using delegate " + r.getClass().getName());
-		return oResult;
-	}
 	
 	private static Class<?>[] getAllInterfaces(Class<?> pClass) {
 		Set<Class<?>> oInterfaces = new HashSet<Class<?>>();
@@ -89,20 +81,23 @@ public class Workers {
 		}
 		return oInterfaces.toArray(new Class[] {});
 	}
-
-	public static <S extends IWorker<W,R>, W, R> S supervise(S pSource, long pTimeout, TimeUnit pUnit) {
-		SupervisorWorker<W, R> s = new SupervisorWorker<W, R>(pSource, pTimeout, pUnit);
-		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, s);
+	
+	public static <S extends IWorker<W,R>, W, R> S decorate(IWorker<W, R> pWrapper, S pSource) {
+		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, pWrapper);
 		S oResult = (S) Proxy.newProxyInstance(Commands.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);
-		if (LOGGER.isTraceEnabled()) LOGGER.trace("Created proxy " + oResult.getClass().getName() + " out of " + pSource.getClass().getName() + " using delegate " + s.getClass().getName());
+		if (LOGGER.isTraceEnabled()) LOGGER.trace("Created proxy " + oResult.getClass().getName() + " out of " + pSource.getClass().getName() + " using delegate " + pWrapper.getClass().getName());
 		return oResult;
 	}
 	
+	public static <S extends IWorker<W,R>, W, R> S retry(S pSource, IRetryStrategy pRetryStrategy) {
+		return decorate(new RetryWorker<W, R>(pSource, pRetryStrategy), pSource);
+	}
+
+	public static <S extends IWorker<W,R>, W, R> S supervise(S pSource, long pTimeout, TimeUnit pUnit) {
+		return decorate(new SupervisorWorker<W, R>(pSource, pTimeout, pUnit), pSource);
+	}
+	
 	public static <S extends IWorker<W,R>, W, R> S circuitBreaker(S pSource, ICircuitBreakerStrategy pStrategy) {
-		CircuitBreakerWorker<W, R> c = new CircuitBreakerWorker<W, R>(pSource, pStrategy);
-		WorkerInvocationHandler<S, W, R> oIH = new WorkerInvocationHandler<S, W, R>(pSource, c);
-		S oResult = (S) Proxy.newProxyInstance(Commands.class.getClassLoader(), getAllInterfaces(pSource.getClass()), oIH);
-		if (LOGGER.isTraceEnabled()) LOGGER.trace("Created proxy " + oResult.getClass().getName() + " out of " + pSource.getClass().getName() + " using delegate " + c.getClass().getName());
-		return oResult;
+		return decorate(new CircuitBreakerWorker<W, R>(pSource, pStrategy), pSource);
 	}
 }

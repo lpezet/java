@@ -35,9 +35,4 @@ public interface IRetryStrategy {
 
 	public <T> T executeAndRetry(Callable<T> pCallable) throws Exception;
 	
-	/*
-	public <T> T executeAndRetry(ICommand<T> pCommand) throws Exception;
-	
-	public <T> T executeAndRetry(IActivity<T> pActivity, IContext pContext) throws Exception;
-	*/
 }

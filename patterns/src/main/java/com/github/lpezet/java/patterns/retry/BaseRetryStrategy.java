@@ -52,7 +52,7 @@ public class BaseRetryStrategy implements IRetryStrategy {
 		while(true) {
 			oExecutions++;
 			try {
-				if (mLogger.isTraceEnabled() && oExecutions > 1) mLogger.trace("Retry #{}", oExecutions-1);
+				if (mLogger.isTraceEnabled() && oExecutions > 1) mLogger.trace("Retry #{}", oExecutions-1); 
 				return pCallable.call();
 			} catch (Exception e) {
 				if (mLogger.isTraceEnabled()) mLogger.trace("Got an exception: {}...", e.getMessage());
