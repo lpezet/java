@@ -8,6 +8,30 @@
 		<artifactId>parent</artifactId>
 		<version>0.0.3</version>
 	</parent>
+	<repositories>
+		<repository>
+			<id>lpezet-snapshot</id>
+			<url>https://repository-lpezet.forge.cloudbees.com/snapshot/</url>
+			<name>LPezet Snapshot Repo</name>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>lpezet-release</id>
+			<url>https://repository-lpezet.forge.cloudbees.com/release/</url>
+			<name>LPezet Snapshot Repo</name>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+	</repositories>
 	
 	<scm>
 		<connection>scm:git:ssh://git@github.com/lpezet/java.git</connection>
