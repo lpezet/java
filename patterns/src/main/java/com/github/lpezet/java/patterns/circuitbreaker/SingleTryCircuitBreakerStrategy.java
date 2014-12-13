@@ -70,20 +70,21 @@ public class SingleTryCircuitBreakerStrategy implements ICircuitBreakerHandler {
 		// Limit the number of threads to be executed when the breaker is HalfOpen.
 		boolean oLockAcquired = mLock.tryLock();
 		if (!oLockAcquired) throw new CircuitBreakerOpenException();
-		if (mLogger.isTraceEnabled()) mLogger.trace("Acquired lock. Will try callable.");
+		if (mLogger.isTraceEnabled()) mLogger.trace("Setting circuit breaker to " + CircuitBreakerState.HalfOpen + "...");
 		pCircuitBreaker.halfOpen();
+		if (mLogger.isTraceEnabled()) mLogger.trace("Lock acquired: trying operation again to close circuit upon success...");
 		// Lock acquired, we'll try the operation again
 		try {
 			T oResult = pCallable.call();
-			if (mLogger.isTraceEnabled()) mLogger.trace("Resetting circuit breaker.");
+			if (mLogger.isTraceEnabled()) mLogger.trace("Success. Resetting circuit breaker.");
 			// Operation succeeded so we reset the state to closed
 			pCircuitBreaker.reset();
 			return oResult;
 		} catch (Exception e) {
-			if (mLogger.isTraceEnabled()) mLogger.trace("Still getting exception from callable: {}. Tripping circuit breaker and re-throwing.", e.getMessage());
-			mLogger.error("Got exception.", e);
+			if (mLogger.isTraceEnabled()) mLogger.trace("Failed. Still getting exception from callable: {}. Tripping circuit breaker and re-throwing.", e.getMessage());
 			// If there is still an exception, trip the breaker again immediately.
 			pCircuitBreaker.trip(e);
+			mLogger.error("Got exception. Re-throwing...", e);
 			// Throw the exception so that the caller knows which exception occurred.
             throw e;
 		} finally {
