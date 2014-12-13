@@ -59,11 +59,11 @@ public class Splitters {
 				List<T> oResult = new ArrayList<T>();
 				int oAmountOfWork = pSplitter.count(pWork); 
 				if (oAmountOfWork < pChunkSize) {
-					LOGGER.debug("Not dividing up work: too small.");
+					if (LOGGER.isDebugEnabled()) LOGGER.debug("Not dividing up work: too small.");
 					oResult.add(pWork);
 				} else {
 					int n = (int) Math.ceil( oAmountOfWork / (double) pChunkSize );
-					LOGGER.debug("Dividing up work into " + n + " chunks.");
+					if (LOGGER.isDebugEnabled()) LOGGER.debug("Dividing up work into " + n + " chunks.");
 					int oTo, oFrom;
 					for (int i = 0; i < n; i++) {
 						oFrom = i * pChunkSize + 1;
@@ -92,11 +92,11 @@ public class Splitters {
 				List<T> oResult = new ArrayList<T>();
 				int oAmountOfWork = pSplitter.count(pWork); 
 				if (oAmountOfWork < pMinChunkSize) {
-					LOGGER.debug("Not dividing up work: too small.");
+					if (LOGGER.isDebugEnabled()) LOGGER.debug("Not dividing up work: too small.");
 					oResult.add(pWork);
 				} else {
 					int oChunkSize = (int) Math.ceil( oAmountOfWork / (double) pChunks );
-					LOGGER.debug("Dividing up work into " + pChunks + " chunks of " + oChunkSize + " work each.");
+					if (LOGGER.isDebugEnabled()) LOGGER.debug("Dividing up work into " + pChunks + " chunks of " + oChunkSize + " work each.");
 					int oTo, oFrom;
 					for (int i = 0; i < pChunks; i++) {
 						oFrom = i * oChunkSize + 1;
