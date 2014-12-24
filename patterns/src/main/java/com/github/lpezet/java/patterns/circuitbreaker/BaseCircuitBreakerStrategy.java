@@ -49,16 +49,16 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 	@Override
 	public <T> T executeAndTrip(Callable<T> pCallable) throws Exception {
 		if (!mCircuitBreaker.isClosed()) {
-			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker not closed. Handling open state...");
+			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker " + mCircuitBreaker.getState() + ". Handling open state...");
 			return mCircuitBreakerHandler.handleOpen(mCircuitBreaker, pCallable);
 		} else {
-			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker half open. Using callable.");
+			if (mLogger.isTraceEnabled()) mLogger.trace("Circuit breaker " + (mCircuitBreaker.getState()) + ". Using callable.");
 			try {
 				return pCallable.call();
 			} catch (Exception e) {
 				if (mLogger.isTraceEnabled()) mLogger.trace("Got exception: {}. Tripping circuit breaker and re-throwing exception.", e.getMessage());
-				mLogger.error("Got exception. Will re-throw.", e);
 				mCircuitBreaker.trip(e);
+				mLogger.error("Got exception. Re-throwing...", e);
 				throw e;
 			}
 		}
