@@ -47,7 +47,7 @@ Attribute | Description
 **timeunit** | Time unit of *timeout*.
 
 	
-## Combing multiple annotations
+## Combining multiple patterns (annotations)
 
 It's possible to combine multiple annotations like so:
 
