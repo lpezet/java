@@ -36,6 +36,10 @@ Both a Command and Activity implementation are provided.
 
 For more info, see [Command Patterns](http://mezzetin.blogspot.com/2014/03/execute-retry-trip.html) and [Circuit Breaker Pattern](http://msdn.microsoft.com/en-us/library/dn589784.aspx).
 
+Other uses and implementations:
+
+* [Apache Camel: Load Balancer](http://camel.apache.org/load-balancer.html#LoadBalancer-CircuitBreaker)
+
 ### Supervisor Pattern
 This pattern provides a very simple way to monitor the time of the execution of certain code.
 This can be used to fail fast for example, in cases where hanging or significant-and-unpredictable latency may happen. 

@@ -40,10 +40,18 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 	
 	private ICircuitBreaker mCircuitBreaker;
 	private ICircuitBreakerHandler mCircuitBreakerHandler;
+	private ICircuitBreakerLogic mCircuitBreakerLogic;
 	
 	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler) {
 		mCircuitBreaker = pCircuitBreaker;
 		mCircuitBreakerHandler = pHandler;
+		mCircuitBreakerLogic = new BaseCircuitBreakerLogic(Exception.class, 1);
+	}
+	
+	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler, ICircuitBreakerLogic pCircuitBreakerLogic) {
+		mCircuitBreaker = pCircuitBreaker;
+		mCircuitBreakerHandler = pHandler;
+		mCircuitBreakerLogic = pCircuitBreakerLogic;
 	}
 	
 	@Override
@@ -56,8 +64,10 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 			try {
 				return pCallable.call();
 			} catch (Exception e) {
-				if (mLogger.isTraceEnabled()) mLogger.trace("Got exception: {}. Tripping circuit breaker and re-throwing exception.", e.getMessage());
-				mCircuitBreaker.trip(e);
+				if (mCircuitBreakerLogic.shouldTrip(e)) {
+					if (mLogger.isTraceEnabled()) mLogger.trace("Got exception: {}. Tripping circuit breaker and re-throwing exception.", e.getMessage());
+					mCircuitBreaker.trip(e);
+				}
 				mLogger.error("Got exception. Re-throwing...", e);
 				throw e;
 			}

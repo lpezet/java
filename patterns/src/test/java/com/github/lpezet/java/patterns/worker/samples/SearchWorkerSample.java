@@ -141,7 +141,7 @@ public class SearchWorkerSample {
 	}
 	
 	/**
-	 * Using ne Search Worker to run a search with domai classes. Here the work will be split and the results merged. And this is without changing how the search gets called.
+	 * Using Search Worker to run a search with domain classes. Here the work will be split and the results merged. And this is without changing how the search gets called.
 	 * A ISplitter and IMerger needs to be specified here.
 	 * 
 	 * @throws Exception
@@ -181,11 +181,12 @@ public class SearchWorkerSample {
 			}
 		};
 		
-		IWorkSplitter<SearchParameters> oSP = Splitters.splitByChunkSize(10, oSplitter);
+		IWorkSplitter<SearchParameters> oSP = null;
 		SearchMerger oSM = new SearchMerger();
 		SearchWorker oSW = new SearchWorker(s);
 		
 		LOGGER.info("Splitting by chunk size...");
+		oSP = Splitters.splitByChunkSize(10, oSplitter);
 		assertWorks(oES, oSP, oSM, oSW, new SearchParameters(13, 65, "something here"));
 		
 		LOGGER.info("Splitting by chunks...");
