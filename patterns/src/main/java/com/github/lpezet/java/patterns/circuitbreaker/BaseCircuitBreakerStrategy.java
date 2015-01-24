@@ -40,18 +40,18 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 	
 	private ICircuitBreaker mCircuitBreaker;
 	private ICircuitBreakerHandler mCircuitBreakerHandler;
-	private ICircuitBreakerLogic mCircuitBreakerLogic;
+	private ICircuitBreakerCondition mCircuitBreakerCondition;
 	
 	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler) {
 		mCircuitBreaker = pCircuitBreaker;
 		mCircuitBreakerHandler = pHandler;
-		mCircuitBreakerLogic = new BaseCircuitBreakerLogic(Exception.class, 1);
+		mCircuitBreakerCondition = new BaseCircuitBreakerCondition(Exception.class, 1);
 	}
 	
-	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler, ICircuitBreakerLogic pCircuitBreakerLogic) {
+	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler, ICircuitBreakerCondition pCircuitBreakerCondition) {
 		mCircuitBreaker = pCircuitBreaker;
 		mCircuitBreakerHandler = pHandler;
-		mCircuitBreakerLogic = pCircuitBreakerLogic;
+		mCircuitBreakerCondition = pCircuitBreakerCondition;
 	}
 	
 	@Override
@@ -64,7 +64,7 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 			try {
 				return pCallable.call();
 			} catch (Exception e) {
-				if (mCircuitBreakerLogic.shouldTrip(e)) {
+				if (mCircuitBreakerCondition.shouldTrip(e)) {
 					if (mLogger.isTraceEnabled()) mLogger.trace("Got exception: {}. Tripping circuit breaker and re-throwing exception.", e.getMessage());
 					mCircuitBreaker.trip(e);
 				}

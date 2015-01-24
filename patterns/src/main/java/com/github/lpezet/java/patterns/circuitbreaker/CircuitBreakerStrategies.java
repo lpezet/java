@@ -32,11 +32,11 @@ package com.github.lpezet.java.patterns.circuitbreaker;
 public class CircuitBreakerStrategies {
 	
 	public static ICircuitBreakerStrategy newSimpleCircuitBreakerStrategy(int pNumberOfExceptionsToTrip, Class<? extends Exception> pTriper) {
-		return newBaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), new BaseCircuitBreakerLogic(pTriper, pNumberOfExceptionsToTrip));
+		return newBaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), new BaseCircuitBreakerCondition(pTriper, pNumberOfExceptionsToTrip));
 	}
 	
-	public static ICircuitBreakerStrategy newBaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerLogic pLogic) {
-		return new BaseCircuitBreakerStrategy(pCircuitBreaker, new SingleTryCircuitBreakerStrategy(), pLogic);
+	public static ICircuitBreakerStrategy newBaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerCondition pCondition) {
+		return new BaseCircuitBreakerStrategy(pCircuitBreaker, new SingleTryCircuitBreakerStrategy(), pCondition);
 	}
 	
 	public static ICircuitBreakerStrategy newSingleTryCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker) {
