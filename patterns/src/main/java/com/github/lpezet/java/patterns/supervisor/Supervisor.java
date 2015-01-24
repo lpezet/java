@@ -62,10 +62,9 @@ public class Supervisor<T> implements ISupervisor<T> {
 				try {
 				T oResult = pCallable.call();
 				oCountdown.countDown();
-				System.out.println("Returning result......");
+				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result...");
 				return oResult;
 				} catch (Exception e) {
-					//e.printStackTrace();
 					mLogger.error("Unexpected error.", e);
 					throw e;
 				}
