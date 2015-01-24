@@ -15,11 +15,10 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerLogic;
-import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerLogicTest;
+import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerCondition;
 import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerStrategy;
+import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerCondition;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerHandler;
-import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerLogic;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
 import com.github.lpezet.java.patterns.circuitbreaker.InMemoryCircuitBreaker;
 
@@ -92,16 +91,15 @@ public class CircuitBreakerAspect {
 		}
 	}
 	
-	
 	protected ICircuitBreakerStrategy createCircuitBreakerStrategy(CircuitBreaker pAnnotation) throws Exception {
-		ICircuitBreakerLogic oLogic = pAnnotation.logic().newInstance();
-		if (oLogic instanceof BaseCircuitBreakerLogic) {
-			BaseCircuitBreakerLogic oBaseLogic = (BaseCircuitBreakerLogic) oLogic;
-			oBaseLogic.setExceptionsToTrip(pAnnotation.exceptionsToTrip());
-			oBaseLogic.setTriper(pAnnotation.triper());
+		ICircuitBreakerCondition oCondition = pAnnotation.condition().newInstance();
+		if (oCondition instanceof BaseCircuitBreakerCondition) {
+			BaseCircuitBreakerCondition oBaseCondition = (BaseCircuitBreakerCondition) oCondition;
+			oBaseCondition.setExceptionsToTrip(pAnnotation.exceptionsToTrip());
+			oBaseCondition.setTriper(pAnnotation.triper());
 		}
 		ICircuitBreakerHandler oOpenHandler = pAnnotation.openHandler().newInstance();
-		return new BaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), oOpenHandler, oLogic);
+		return new BaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), oOpenHandler, oCondition);
 	}
 		 
 }

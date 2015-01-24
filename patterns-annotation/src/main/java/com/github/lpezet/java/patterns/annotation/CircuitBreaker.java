@@ -8,9 +8,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerLogic;
+import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerCondition;
+import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerCondition;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerHandler;
-import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerLogic;
 import com.github.lpezet.java.patterns.circuitbreaker.SingleTryCircuitBreakerStrategy;
 
 /**
@@ -25,7 +25,7 @@ public @interface CircuitBreaker {
 	
 	public int exceptionsToTrip() default 3;
 	
-	public Class<? extends ICircuitBreakerLogic> logic() default BaseCircuitBreakerLogic.class;
+	public Class<? extends ICircuitBreakerCondition> condition() default BaseCircuitBreakerCondition.class;
 	
 	public Class<? extends ICircuitBreakerHandler> openHandler() default SingleTryCircuitBreakerStrategy.class;
 	
