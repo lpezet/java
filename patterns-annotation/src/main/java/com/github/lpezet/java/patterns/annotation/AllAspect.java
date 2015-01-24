@@ -31,7 +31,6 @@ import com.github.lpezet.java.patterns.retry.ExponentialBackoffStrategy;
 import com.github.lpezet.java.patterns.retry.IBackoffStrategy;
 import com.github.lpezet.java.patterns.retry.IRetryCondition;
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
-import com.github.lpezet.java.patterns.supervisor.Supervisor;
 import com.github.lpezet.java.patterns.worker.CircuitBreakerWorker;
 import com.github.lpezet.java.patterns.worker.IWorker;
 import com.github.lpezet.java.patterns.worker.RetryWorker;
@@ -56,8 +55,7 @@ public class AllAspect {
 	@Pointcut(value="@annotation(com.github.lpezet.java.patterns.annotation.ShortCircuit)")
 	public void shortCircuitAnnotation() {}
 	
-	private static final IWorker<ICommand<Object>, Object> DUMMY_WORDER = new IWorker<ICommand<Object>, Object>() {
-		
+	private static final IWorker<ICommand<Object>, Object> COMMAND_WORKER = new IWorker<ICommand<Object>, Object>() {
 		@Override
 		public Object perform(ICommand<Object> pWork) throws Exception {
 			return pWork.execute();
@@ -92,9 +90,9 @@ public class AllAspect {
 					Annotation[] oAnnotations = getAnnotations(pJoinPoint);
 					oWorker = createWorker(oAnnotations);
 				} catch (SecurityException e) {
-					oWorker = DUMMY_WORDER;
+					oWorker = COMMAND_WORKER;
 				} catch (NoSuchMethodException e) {
-					oWorker = DUMMY_WORDER;
+					oWorker = COMMAND_WORKER;
 				}
 				mWorkers.put(oKey, oWorker);
 			}
@@ -109,13 +107,7 @@ public class AllAspect {
 	
 	
 	private IWorker<ICommand<Object>, Object> createWorker(Annotation[] pAnnotations) throws Exception {
-		IWorker<ICommand<Object>, Object> oCommandWorker = new IWorker<ICommand<Object>, Object>() {
-			@Override
-			public Object perform(ICommand<Object> pWork) throws Exception {
-				return pWork.execute();
-			}
-		};
-		IWorker oPreviousWorker = oCommandWorker;
+		IWorker oPreviousWorker = COMMAND_WORKER;
 		for (int i = pAnnotations.length - 1; i >= 0; i--) {
 			Annotation a = pAnnotations[i];
 			IWorker oWorker = newWorker(a, oPreviousWorker);
