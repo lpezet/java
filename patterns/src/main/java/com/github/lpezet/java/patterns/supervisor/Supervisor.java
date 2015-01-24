@@ -60,12 +60,11 @@ public class Supervisor<T> implements ISupervisor<T> {
 			@Override
 			public T call() throws Exception {
 				try {
-				T oResult = pCallable.call();
-				oCountdown.countDown();
-				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result...");
-				return oResult;
+					T oResult = pCallable.call();
+					oCountdown.countDown();
+					if (mLogger.isTraceEnabled()) mLogger.trace("Thread interrupted? " + Thread.interrupted() + ". Returning result...");
+					return oResult;
 				} catch (Exception e) {
-					mLogger.error("Unexpected error.", e);
 					throw e;
 				}
 			}
@@ -74,21 +73,25 @@ public class Supervisor<T> implements ISupervisor<T> {
 			boolean oTimedout = ! oCountdown.await(mTimeout, mTimeoutUnit);
 			if (mLogger.isTraceEnabled()) mLogger.trace("Timedout={}, call done={}", new Object[] {oTimedout, f.isDone()});
 			if (oTimedout && !f.isDone()) {
-				abort(pCallable);
+				cancel(f, pCallable);
 				throw new TimeoutException();
 			} else {
-				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result." + f.isDone());
+				if (mLogger.isTraceEnabled()) mLogger.trace("Returning result.");// + f.isDone());
 				return f.get();
 			}
 		} catch (InterruptedException e) {
 			if (mLogger.isInfoEnabled()) mLogger.info("Got interrupted. Will try to abort callable then re-throw exception.");
-			abort(pCallable);
+			cancel(f, pCallable);
 			throw e;
 		}
 		
 	}
 
-	public void abort(Callable<T> pCallable) {
+	public void cancel(Future pFuture, Callable<T> pCallable) {
+		if (mLogger.isTraceEnabled()) mLogger.trace("Cancelling task...");
+		pFuture.cancel(true);
+		if (mLogger.isTraceEnabled()) mLogger.trace("Task canceled.");
+		
 		if (!(pCallable instanceof IAbortable)) return;
 		if (mLogger.isTraceEnabled()) mLogger.trace("Aborting callable...");
 		IAbortable oAC = (IAbortable) pCallable;
