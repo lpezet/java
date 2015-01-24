@@ -19,7 +19,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.SingleTryCircuitBreakerStr
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface CircuitBreaker {
+public @interface ShortCircuit {
 
 	public Class<? extends Exception> triper() default Exception.class;
 	

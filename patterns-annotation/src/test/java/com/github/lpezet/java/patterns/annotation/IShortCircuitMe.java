@@ -9,7 +9,7 @@ package com.github.lpezet.java.patterns.annotation;
  */
 public interface IShortCircuitMe {
 
-	public void doSomething();
+	public boolean doSomething();
 	
 	public int timesExecuted();
 }

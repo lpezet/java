@@ -10,19 +10,27 @@ package com.github.lpezet.java.patterns.annotation;
 public class ShortCircuitMe implements IShortCircuitMe {
 
 	private int mTimesExecuted = 0;
+	private IExceptionThrower<IShortCircuitMe> mExceptionThrower = new IExceptionThrower<IShortCircuitMe>() {
+		
+		@Override
+		public boolean shouldThrow(IShortCircuitMe pContext) {
+			return pContext.timesExecuted() == 1;
+		}
+	};
 	
-	@Override
-	@CircuitBreaker(triper=ArrayIndexOutOfBoundsException.class, exceptionsToTrip=1)
-	public void doSomething() {
-		mTimesExecuted++;
-		System.out.println("## I'm doing something...");
-		throwOnlyOnce();
-		System.out.println("## I've done something!");
+	public void setExceptionThrower(IExceptionThrower<IShortCircuitMe> pExceptionThrower) {
+		mExceptionThrower = pExceptionThrower;
 	}
 	
-	private void throwOnlyOnce() {
-		if (mTimesExecuted == 1) 
+	@Override
+	@ShortCircuit(triper=ArrayIndexOutOfBoundsException.class, exceptionsToTrip=1)
+	public boolean doSomething() {
+		mTimesExecuted++;
+		System.out.println("## I'm doing something...");
+		if (mExceptionThrower.shouldThrow(this))
 			throw new ArrayIndexOutOfBoundsException("I did something wrong !");
+		System.out.println("## I've done something!");
+		return true;
 	}
 
 	public int timesExecuted() {

@@ -27,7 +27,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.InMemoryCircuitBreaker;
  *
  */
 @Aspect
-public class CircuitBreakerAspect {
+public class ShortCircuitAspect {
 	
 	private final static ICircuitBreakerStrategy DUMMY_CB_STRATEGY = new ICircuitBreakerStrategy() {
 		@Override
@@ -59,7 +59,7 @@ public class CircuitBreakerAspect {
 			        try {
 			        	// NB: This is because the joint point might be an interface and not its implementation.
 			        	oMethod= pJoinPoint.getTarget().getClass().getDeclaredMethod(pJoinPoint.getSignature().getName(), oMethod.getParameterTypes());
-			        	CircuitBreaker oAnnotation = oMethod.getAnnotation(CircuitBreaker.class);
+			        	ShortCircuit oAnnotation = oMethod.getAnnotation(ShortCircuit.class);
 			        	oStgy = createCircuitBreakerStrategy(oAnnotation);
 			        } catch (final SecurityException e) {
 			            mLogger.error("Could not get method to wrap CircuitBreaker around. Setting up pass-through CircuitBreakerStrategy for " + pJoinPoint.getTarget(), e);
@@ -91,7 +91,7 @@ public class CircuitBreakerAspect {
 		}
 	}
 	
-	protected ICircuitBreakerStrategy createCircuitBreakerStrategy(CircuitBreaker pAnnotation) throws Exception {
+	protected ICircuitBreakerStrategy createCircuitBreakerStrategy(ShortCircuit pAnnotation) throws Exception {
 		ICircuitBreakerCondition oCondition = pAnnotation.condition().newInstance();
 		if (oCondition instanceof BaseCircuitBreakerCondition) {
 			BaseCircuitBreakerCondition oBaseCondition = (BaseCircuitBreakerCondition) oCondition;

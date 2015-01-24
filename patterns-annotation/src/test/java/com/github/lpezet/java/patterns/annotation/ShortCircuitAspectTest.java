@@ -4,6 +4,8 @@
 package com.github.lpezet.java.patterns.annotation;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class CircuitBreakerAspectTest {
+public class ShortCircuitAspectTest {
 
 	@Autowired
 	private IShortCircuitMe mTest;
@@ -25,19 +27,21 @@ public class CircuitBreakerAspectTest {
 	@Test
 	public void doIt() throws Exception {
 		assertEquals(0, mTest.timesExecuted());
-		doSometing();
+		assertFalse( doSometing() ); // Exception thrown
 		assertEquals(1, mTest.timesExecuted());
-		doSometing();
+		assertFalse( doSometing() ); // CircuitBreaker Open
 		assertEquals(1, mTest.timesExecuted());
-		Thread.sleep(700);
+		Thread.sleep(700); // Waiting for Circuit Break to go from Hafl Open to Open.
 		// Back to normal
-		doSometing();
-		assertEquals(2, mTest.timesExecuted());
+		assertTrue( doSometing() );
+		assertEquals(2, mTest.timesExecuted()); // Circuit Break closed.
 	}
 
-	private void doSometing() {
+	private boolean doSometing() {
 		try {
 			mTest.doSomething();
+			return true;
 		} catch(Exception e) {};
+		return false;
 	}
 }
