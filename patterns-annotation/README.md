@@ -14,12 +14,12 @@ Under certain conditions, the method call will be retried.
 
 Attribute | Description
 --------- | -----------
-condition | Specifies the IRetryCondition class to use
-maxExecutions | Specifies the maximum number of times the method should be called (3 calls = 2 retries).
-exception | Specifies which Exception will trigger a retry. Default is java.lang.Exception.
-scaleFactor | Used in the default backoff strategy.
-backoff | Specifies the IBackoffStrategy to use when waiting for the next retry. Default is ExponentialBackoffStrategy.
-maxBackoffInMillis | Maximum time to wait in between retries. Default is 2s.
+**condition** | Specifies the IRetryCondition class to use
+**maxExecutions** | Specifies the maximum number of times the method should be called (3 calls = 2 retries).
+**exception** | Specifies which Exception will trigger a retry. Default is java.lang.Exception.
+**scaleFactor** | Used in the default backoff strategy.
+**backoff** | Specifies the IBackoffStrategy to use when waiting for the next retry. Default is ExponentialBackoffStrategy.
+**maxBackoffInMillis** | Maximum time to wait in between retries. Default is 2s.
 
 	
 
@@ -27,10 +27,26 @@ maxBackoffInMillis | Maximum time to wait in between retries. Default is 2s.
 This annotation wraps a method call with a CircuitBreak.
 Upon certain conditions, the method call will be short-circuited (i.e. not called), then called again upon other conditions.
 
+Attribute | Description
+--------- | -----------
+**triper** | Exception that would trip the circuit breaker. Default is java.lang.Exception.
+**exceptionsToTrip** | Number of exceptions to trip the circuit breaker. Default is 3.
+**condition** | ICircuitBreakerCondition class to use to determine wehter or not the breaker is tripped. Default is BaseCircuitBreakerCondition.
+**openHandler** | ICircuitBreakerHandler class to use to handle the breaker when open. Default is SingleTryCircuitBreakerStrategy.
+
 ### @Supervise
 This annotation wraps a method call with a Supervisor.
 This object will monitor the time of execution of the method, and throws a TimeoutException if not completed within a certain time frame.
 
+
+Attribute | Description
+--------- | -----------
+**executeServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
+**threads** | If using the default IExecutorServiceFactory, set the number of threads in the fixed pool.
+**timeout** | Time to wait for method call to complete.
+**timeunit** | Time unit of *timeout*.
+
+	
 ## Combing multiple annotations
 
 It's possible to combine multiple annotations like so:
