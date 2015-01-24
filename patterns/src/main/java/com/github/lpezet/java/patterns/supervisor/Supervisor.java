@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author luc
  *
  */
-public class Supervisor<T> {
+public class Supervisor<T> implements ISupervisor<T> {
 	
 	private Logger mLogger = LoggerFactory.getLogger(Supervisor.class);
 
