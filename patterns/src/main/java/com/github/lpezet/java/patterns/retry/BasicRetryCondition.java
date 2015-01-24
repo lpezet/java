@@ -27,13 +27,31 @@ import java.util.concurrent.Callable;
 public class BasicRetryCondition implements IRetryCondition {
 	
 	private int mMaxExecutions = 3;
-	private Class mException;
+	private Class<? extends Exception> mException = Exception.class;
 	
-	public BasicRetryCondition(Class pException, int pMaxExecutions) {
+	public BasicRetryCondition() {
+	}
+	
+	public BasicRetryCondition(Class<? extends Exception> pException, int pMaxExecutions) {
 		mException = pException;
 		mMaxExecutions = pMaxExecutions;
 	}
 	
+	public void setException(Class<? extends Exception> pException) {
+		mException = pException;
+	}
+	
+	public void setMaxExecutions(int pMaxExecutions) {
+		mMaxExecutions = pMaxExecutions;
+	}
+	
+	public Class<? extends Exception> getException() {
+		return mException;
+	}
+	
+	public int getMaxExecutions() {
+		return mMaxExecutions;
+	}
 	
 	@Override
 	public <T> boolean shouldRetry(Callable<T> pCallable, int pExecutions, Throwable pException) {

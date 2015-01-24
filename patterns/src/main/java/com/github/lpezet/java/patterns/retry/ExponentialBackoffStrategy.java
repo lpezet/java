@@ -40,7 +40,7 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
 	private static final int MAX_BACKOFF_IN_MILLISECONDS = 20 * 1000;
 	
 	private int mScaleFactor = SCALE_FACTOR;
-	private int mMaxBackoffInMillis = MAX_BACKOFF_IN_MILLISECONDS;
+	private long mMaxBackoffInMillis = MAX_BACKOFF_IN_MILLISECONDS;
 	
 	public ExponentialBackoffStrategy() {
 	}
@@ -52,6 +52,22 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
 	public ExponentialBackoffStrategy(int pScaleFactor, int pMaxBackoffInMillis) {
 		mScaleFactor = pScaleFactor;
 		mMaxBackoffInMillis = pMaxBackoffInMillis;
+	}
+	
+	public void setMaxBackoffInMillis(long pMaxBackoffInMillis) {
+		mMaxBackoffInMillis = pMaxBackoffInMillis;
+	}
+	
+	public void setScaleFactor(int pScaleFactor) {
+		mScaleFactor = pScaleFactor;
+	}
+	
+	public long getMaxBackoffInMillis() {
+		return mMaxBackoffInMillis;
+	}
+	
+	public int getScaleFactor() {
+		return mScaleFactor;
 	}
 	
 	@Override
@@ -72,7 +88,7 @@ public class ExponentialBackoffStrategy implements IBackoffStrategy {
 		int scaleFactor = mScaleFactor;
 
 		long delay = (1 << retries) * scaleFactor;
-		delay = Math.min(delay, MAX_BACKOFF_IN_MILLISECONDS);
+		delay = Math.min(delay, mMaxBackoffInMillis);
 
 		return delay;
 	}
