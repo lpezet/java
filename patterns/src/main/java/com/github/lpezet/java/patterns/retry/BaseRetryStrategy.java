@@ -55,7 +55,7 @@ public class BaseRetryStrategy implements IRetryStrategy {
 				if (mLogger.isTraceEnabled() && oExecutions > 1) mLogger.trace("Retry #{}", oExecutions-1); 
 				return pCallable.call();
 			} catch (Exception e) {
-				if (mLogger.isTraceEnabled()) mLogger.trace("Got an exception: {}...", e.getMessage());
+				if (mLogger.isTraceEnabled()) mLogger.trace("Got an exception: {}...", e);
 				if (!mRetryCondition.shouldRetry(pCallable, oExecutions, e)) {
 					if (mLogger.isTraceEnabled()) mLogger.trace("...no retrying.");
 					throw e;
