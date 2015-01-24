@@ -16,7 +16,7 @@ public class BaseCircuitBreakerLogic implements ICircuitBreakerLogic {
 
 	private Logger mLogger = LoggerFactory.getLogger(this.getClass());
 	
-	private Class<? extends Exception> mTriper;
+	private Class<? extends Exception> mTriper = Exception.class;
 	private int mExceptionsToTrip = 1;
 	private AtomicInteger mCurrentErrors = new AtomicInteger(0);
 	
