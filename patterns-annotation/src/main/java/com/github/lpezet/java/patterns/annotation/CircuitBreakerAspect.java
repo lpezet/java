@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerLogic;
+import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerLogicTest;
 import com.github.lpezet.java.patterns.circuitbreaker.BaseCircuitBreakerStrategy;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerHandler;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerLogic;
