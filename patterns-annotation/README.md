@@ -63,9 +63,9 @@ public boolean doSomething() throws Exception {
 
 The order is the order in which they are defined here.
 In the previous example, it means:
-* ShortCircuit wraps Retry
-* Retry wraps Supervise
-* Supervise wraps method
+* @ShortCircuit wraps @Retry
+* @Retry wraps @Supervise
+* @Supervise wraps *doSomething()*
 
 In other words:
 * doSomething() will be monitored by a Supervisor, throwing a TimeoutException if it takes more than 100 millis to complete.
