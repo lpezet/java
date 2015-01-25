@@ -5,6 +5,7 @@ package com.github.lpezet.java.patterns.annotation;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,8 +24,6 @@ import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerCondition;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerHandler;
 import com.github.lpezet.java.patterns.circuitbreaker.ICircuitBreakerStrategy;
 import com.github.lpezet.java.patterns.circuitbreaker.InMemoryCircuitBreaker;
-import com.github.lpezet.java.patterns.command.BaseCommand;
-import com.github.lpezet.java.patterns.command.ICommand;
 import com.github.lpezet.java.patterns.retry.BaseRetryStrategy;
 import com.github.lpezet.java.patterns.retry.BasicRetryCondition;
 import com.github.lpezet.java.patterns.retry.ExponentialBackoffStrategy;
@@ -32,8 +31,11 @@ import com.github.lpezet.java.patterns.retry.IBackoffStrategy;
 import com.github.lpezet.java.patterns.retry.IRetryCondition;
 import com.github.lpezet.java.patterns.retry.IRetryStrategy;
 import com.github.lpezet.java.patterns.worker.CircuitBreakerWorker;
+import com.github.lpezet.java.patterns.worker.IResultMerger;
+import com.github.lpezet.java.patterns.worker.IWorkSplitter;
 import com.github.lpezet.java.patterns.worker.IWorker;
 import com.github.lpezet.java.patterns.worker.RetryWorker;
+import com.github.lpezet.java.patterns.worker.SimpleSPMWorker;
 import com.github.lpezet.java.patterns.worker.SupervisorWorker;
 
 /**
@@ -55,49 +57,47 @@ public class AllAspect {
 	@Pointcut(value="@annotation(com.github.lpezet.java.patterns.annotation.ShortCircuit)")
 	public void shortCircuitAnnotation() {}
 	
-	private static final IWorker<ICommand<Object>, Object> COMMAND_WORKER = new IWorker<ICommand<Object>, Object>() {
+	@Pointcut(value="@annotation(com.github.lpezet.java.patterns.annotation.DivideAndConquer)")
+	public void divideAndConquerAnnotation() {}
+	
+	private static final IWorker<ProceedingJointPointAndArgs, Object> PJP_WORKER = new IWorker<ProceedingJointPointAndArgs, Object>() {
+		
 		@Override
-		public Object perform(ICommand<Object> pWork) throws Exception {
-			return pWork.execute();
+		public Object perform(ProceedingJointPointAndArgs pWork) throws Exception {
+			try {
+				return pWork.getProceedingJoinPoint().proceed(pWork.getArgs());
+			} catch (Exception e) {
+				throw e;
+			} catch (Throwable e) {
+				throw new Exception(e); // wrapping Errors
+			}
 		}
 	};
-	private Logger mLogger = LoggerFactory.getLogger(this.getClass());
-	private WeakHashMap<String, IWorker<ICommand<Object>, Object>> mWorkers = new WeakHashMap<String, IWorker<ICommand<Object>,Object>>();
 	
-	@Around("anyPublicMethod() && (superviseAnnotation() || retryAnnotation() || shortCircuitAnnotation())")
+	private Logger mLogger = LoggerFactory.getLogger(this.getClass());
+	private WeakHashMap<String, IWorker<ProceedingJointPointAndArgs, Object>> mWorkers = new WeakHashMap<String, IWorker<ProceedingJointPointAndArgs, Object>>();
+	
+	@Around("anyPublicMethod() && (superviseAnnotation() || retryAnnotation() || shortCircuitAnnotation() || divideAndConquerAnnotation())")
 	public Object handle(final ProceedingJoinPoint pJoinPoint) throws Throwable {
-		//if (mLogger.isTraceEnabled()) mLogger.trace("Supervising " + pJoinPoint.getSignature() + "...");
 		if (mLogger.isTraceEnabled()) mLogger.trace("Advising " + pJoinPoint.getSignature() + "...");
+		System.out.println("Args = " + Arrays.asList( pJoinPoint.getArgs() ));
 		try {
-			// Create command out of joint point
-			ICommand<Object> oCommand = new BaseCommand<Object>() {
-				@Override
-				public Object execute() throws Exception {
-					try {
-						return pJoinPoint.proceed();
-					} catch (Exception e) {
-						throw e;
-					} catch (Throwable t) {
-						throw new Exception(t);
-					}
-				}
-			};
+			ProceedingJointPointAndArgs oParameters = new ProceedingJointPointAndArgs(pJoinPoint, pJoinPoint.getArgs());
 			// Get Worker
 			String oKey = pJoinPoint.getTarget().toString();
-			IWorker<ICommand<Object>, Object> oWorker = mWorkers.get(oKey);
+			IWorker<ProceedingJointPointAndArgs, Object> oWorker = mWorkers.get(oKey);
 			if (oWorker == null) {
 				try {
 					Annotation[] oAnnotations = getAnnotations(pJoinPoint);
 					oWorker = createWorker(oAnnotations);
 				} catch (SecurityException e) {
-					oWorker = COMMAND_WORKER;
+					oWorker = PJP_WORKER;
 				} catch (NoSuchMethodException e) {
-					oWorker = COMMAND_WORKER;
+					oWorker = PJP_WORKER;
 				}
 				mWorkers.put(oKey, oWorker);
 			}
-			
-			return oWorker.perform(oCommand);
+			return oWorker.perform(oParameters);
 		} catch (Exception e) {
 			throw e;
 		} catch (Throwable t) {
@@ -106,17 +106,17 @@ public class AllAspect {
 	}
 	
 	
-	private IWorker<ICommand<Object>, Object> createWorker(Annotation[] pAnnotations) throws Exception {
-		IWorker oPreviousWorker = COMMAND_WORKER;
+	private IWorker<ProceedingJointPointAndArgs, Object> createWorker(Annotation[] pAnnotations) throws Exception {
+		IWorker<ProceedingJointPointAndArgs, Object> oPreviousWorker = PJP_WORKER;
 		for (int i = pAnnotations.length - 1; i >= 0; i--) {
 			Annotation a = pAnnotations[i];
-			IWorker oWorker = newWorker(a, oPreviousWorker);
+			IWorker<ProceedingJointPointAndArgs, Object> oWorker = newWorker(a, oPreviousWorker);
 			if (oWorker != null) oPreviousWorker = oWorker;
 		}
 		return oPreviousWorker;
 	}
 
-	private IWorker newWorker(Annotation pAnnotation, IWorker pWorker) throws Exception {
+	private IWorker<ProceedingJointPointAndArgs, Object> newWorker(Annotation pAnnotation, IWorker<ProceedingJointPointAndArgs, Object> pWorker) throws Exception {
 		if (ShortCircuit.class.isAssignableFrom( pAnnotation.annotationType() )) {
 			System.out.println("SC");
 			return newShortCircuit((ShortCircuit) pAnnotation, pWorker);
@@ -126,11 +126,26 @@ public class AllAspect {
 		} else if (Supervise.class.isAssignableFrom( pAnnotation.annotationType() )) {
 			System.out.println("Supervise");
 			return newSupervisor((Supervise) pAnnotation, pWorker);
+		} else if (DivideAndConquer.class.isAssignableFrom( pAnnotation.annotationType() )) {
+			System.out.println("Divide And Conquer");
+			return newSPM((DivideAndConquer) pAnnotation, pWorker);
 		}
 		return null;
 	}
 
-	private IWorker newShortCircuit(ShortCircuit pAnnotation, IWorker pWorker) throws Exception {
+	private IWorker<ProceedingJointPointAndArgs, Object> newSPM(DivideAndConquer pAnnotation, IWorker<ProceedingJointPointAndArgs, Object> pWorker) throws Exception {
+		IWorkSplitter<ProceedingJointPointAndArgs> oSplitter = pAnnotation.splitter().newInstance();
+		IResultMerger<Object> oMerger = pAnnotation.merger().newInstance();
+		IExecutorServiceFactory oFactory = pAnnotation.executorServiceFactory().newInstance();
+		if (oFactory instanceof ExecutorServiceFactory) {
+			int oThreads = pAnnotation.threads();
+			((ExecutorServiceFactory) oFactory).setThreads(oThreads);
+		}
+		ExecutorService oES = oFactory.newExecutorService();
+		return new SimpleSPMWorker<ProceedingJointPointAndArgs, Object>(oES, oSplitter, oMerger, pWorker);
+	}
+
+	private IWorker<ProceedingJointPointAndArgs, Object> newShortCircuit(ShortCircuit pAnnotation, IWorker<ProceedingJointPointAndArgs, Object> pWorker) throws Exception {
 		ICircuitBreakerCondition oCondition = pAnnotation.condition().newInstance();
 		if (oCondition instanceof BaseCircuitBreakerCondition) {
 			BaseCircuitBreakerCondition oBaseCondition = (BaseCircuitBreakerCondition) oCondition;
@@ -139,10 +154,10 @@ public class AllAspect {
 		}
 		ICircuitBreakerHandler oOpenHandler = pAnnotation.openHandler().newInstance();
 		ICircuitBreakerStrategy oStgy = new BaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), oOpenHandler, oCondition);
-		return new CircuitBreakerWorker(pWorker, oStgy);
+		return new CircuitBreakerWorker<ProceedingJointPointAndArgs, Object>(pWorker, oStgy);
 	}
 
-	private IWorker newRetry(Retry pAnnotation, IWorker pWorker) throws Exception {
+	private IWorker<ProceedingJointPointAndArgs, Object> newRetry(Retry pAnnotation, IWorker<ProceedingJointPointAndArgs, Object> pWorker) throws Exception {
 		IRetryCondition oCondition = pAnnotation.condition().newInstance();
 		if (oCondition instanceof BasicRetryCondition) {
 			BasicRetryCondition oBaseCondition = (BasicRetryCondition) oCondition;
@@ -156,10 +171,10 @@ public class AllAspect {
 			oExpo.setScaleFactor(pAnnotation.scaleFactor());
 		}
 		IRetryStrategy oStgy = new BaseRetryStrategy(oCondition, oBackoffStrategy);	
-		return new RetryWorker(pWorker, oStgy);
+		return new RetryWorker<ProceedingJointPointAndArgs, Object>(pWorker, oStgy);
 	}
 
-	private IWorker newSupervisor(Supervise pAnnotation, IWorker pWorker) throws Exception {
+	private IWorker<ProceedingJointPointAndArgs, Object> newSupervisor(Supervise pAnnotation, IWorker<ProceedingJointPointAndArgs, Object> pWorker) throws Exception {
 		IExecutorServiceFactory oFactory = pAnnotation.executorServiceFactory().newInstance();
 		if (oFactory instanceof ExecutorServiceFactory) {
 			int oThreads = pAnnotation.threads();
@@ -168,7 +183,7 @@ public class AllAspect {
 		ExecutorService oES = oFactory.newExecutorService();
 		long oTimeout = pAnnotation.timeout();
 		TimeUnit oTimeUnit = pAnnotation.timeunit();
-		return new SupervisorWorker(pWorker, oES, oTimeout, oTimeUnit);
+		return new SupervisorWorker<ProceedingJointPointAndArgs, Object>(pWorker, oES, oTimeout, oTimeUnit);
 	}
 
 	protected Annotation[] getAnnotations(ProceedingJoinPoint pJoinPoint) throws SecurityException, NoSuchMethodException {
