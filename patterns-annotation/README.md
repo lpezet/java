@@ -41,7 +41,7 @@ This object will monitor the time of execution of the method, and throws a Timeo
 
 Attribute | Description
 --------- | -----------
-**executeServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
+**executorServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
 **threads** | If using the default IExecutorServiceFactory, set the number of threads in the fixed pool.
 **timeout** | Time to wait for method call to complete.
 **timeunit** | Time unit of *timeout*.
@@ -53,7 +53,7 @@ Attribute | Description
 --------- | -----------
 **splitter** | IWorkSplitter class to use to split parameters into chunks.
 **merger** | IResultMerger class to use to merge results from calling the method multiple times.
-**executeServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
+**executorServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
 **threads** | If using the default IExecutorServiceFactory, set the number of threads in the fixed pool.
 
 	
