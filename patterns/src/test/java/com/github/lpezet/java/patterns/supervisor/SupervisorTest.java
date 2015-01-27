@@ -62,7 +62,7 @@ public class SupervisorTest {
 		Callable<Integer> oTest = new Callable<Integer>() {
 			@Override
 			public Integer call() throws Exception {
-				Thread.sleep(99);
+				Thread.sleep(50);
 				return new Random().nextInt(999);
 			}
 		};
