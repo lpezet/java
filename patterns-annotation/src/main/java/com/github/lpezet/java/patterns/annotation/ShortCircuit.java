@@ -21,7 +21,7 @@ import com.github.lpezet.java.patterns.circuitbreaker.SingleTryCircuitBreakerStr
 @Target(ElementType.METHOD)
 public @interface ShortCircuit {
 
-	public Class<? extends Exception> triper() default Exception.class;
+	public Class<? extends Exception>[] tripers() default Exception.class;
 	
 	public int exceptionsToTrip() default 3;
 	

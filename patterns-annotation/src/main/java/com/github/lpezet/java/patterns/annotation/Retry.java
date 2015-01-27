@@ -25,7 +25,7 @@ public @interface Retry {
 	
 	public int maxExecutions() default 3;
 	
-	public Class<? extends Exception> exception() default Exception.class;
+	public Class<? extends Exception>[] exceptions() default Exception.class;
 	
 	public int scaleFactor() default 300;
 	
