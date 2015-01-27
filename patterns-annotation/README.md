@@ -1,7 +1,7 @@
 Patterns Annotation
 ===================
 
-Provides Java annotation to use patterns provided in [Java Patterns](https://github.com/lpezet/java/tree/master/patterns).
+Provides Java annotations to use patterns provided in [Java Patterns](https://github.com/lpezet/java/tree/master/patterns).
 
 
 Documentation
@@ -24,7 +24,7 @@ Attribute | Description
 	
 
 ### @ShortCircuit
-This annotation wraps a method call with a CircuitBreak.
+This annotation wraps a method call with a Circuit Breaker pattern.
 Upon certain conditions, the method call will be short-circuited (i.e. not called), then called again upon other conditions.
 
 Attribute | Description
@@ -45,6 +45,16 @@ Attribute | Description
 **threads** | If using the default IExecutorServiceFactory, set the number of threads in the fixed pool.
 **timeout** | Time to wait for method call to complete.
 **timeunit** | Time unit of *timeout*.
+
+### @DivideAndConquer
+This annotation will wraps a method call with a Split-Process-Merge pattern to execute it as many chunks are created from its parameters.
+
+Attribute | Description
+--------- | -----------
+**splitter** | IWorkSplitter class to use to split parameters into chunks.
+**merger** | IResultMerger class to use to merge results from calling the method multiple times.
+**executeServiceFactory** | IExecutorServiceFactory class to use to create ExecutorService. Default is ExecutorService (creating fixed threads pool).
+**threads** | If using the default IExecutorServiceFactory, set the number of threads in the fixed pool.
 
 	
 ## Combining multiple patterns (annotations)
@@ -70,7 +80,7 @@ In the previous example, it means:
 In other words:
 * doSomething() will be monitored by a Supervisor, throwing a TimeoutException if it takes more than 100 millis to complete.
 * Retry will catch TimeoutException and retry 3 times (default). If it still fails, exception is re-thrown.
-* ShortCircuit will catch exceptions from Retry and trip at the first one raised. After 500ms (default), CircuitBreaker will switch to half-open. Upon another method call, CB will call the method (a single try among many thread if any) and upon success will reset the breaker.
+* ShortCircuit will catch exceptions from Retry and trip at the first one raised. After 500ms (default), CircuitBreaker will switch to half-open. Upon another method call, CB will call the method (a single try among many threads, if any) and upon success will reset the breaker.
 
 
 Installation
