@@ -34,7 +34,7 @@ import java.io.IOException;
 public class RetryStrategies {
 
 	private static final IBackoffStrategy DEFAULT_BACKOFF_STRATEGY = new ExponentialBackoffStrategy();
-	private static final IRetryCondition DEFAULT_RETRY_CONDITION = new BasicRetryCondition(IOException.class, 3);
+	private static final IRetryCondition DEFAULT_RETRY_CONDITION = new BasicRetryCondition(3, IOException.class);
 
 	public static IRetryStrategy defaultBackoffIORetryStrategy() {
 		return new BaseRetryStrategy(DEFAULT_RETRY_CONDITION, DEFAULT_BACKOFF_STRATEGY);

@@ -27,26 +27,26 @@ import java.util.concurrent.Callable;
 public class BasicRetryCondition implements IRetryCondition {
 	
 	private int mMaxExecutions = 3;
-	private Class<? extends Exception> mException = Exception.class;
+	private Class<? extends Exception>[] mExceptions = new Class[] { Exception.class };
 	
 	public BasicRetryCondition() {
 	}
 	
-	public BasicRetryCondition(Class<? extends Exception> pException, int pMaxExecutions) {
-		mException = pException;
+	public BasicRetryCondition(int pMaxExecutions, Class<? extends Exception>... pExceptions) {
+		mExceptions = pExceptions;
 		mMaxExecutions = pMaxExecutions;
 	}
 	
-	public void setException(Class<? extends Exception> pException) {
-		mException = pException;
+	public void setExceptions(Class<? extends Exception>... pExceptions) {
+		mExceptions = pExceptions;
 	}
 	
 	public void setMaxExecutions(int pMaxExecutions) {
 		mMaxExecutions = pMaxExecutions;
 	}
 	
-	public Class<? extends Exception> getException() {
-		return mException;
+	public Class<? extends Exception>[] getExceptions() {
+		return mExceptions;
 	}
 	
 	public int getMaxExecutions() {
@@ -55,8 +55,19 @@ public class BasicRetryCondition implements IRetryCondition {
 	
 	@Override
 	public <T> boolean shouldRetry(Callable<T> pCallable, int pExecutions, Throwable pException) {
-		return pExecutions <= mMaxExecutions
-				&& (mException.isAssignableFrom(pException.getClass()) 
-						|| (pException.getCause() != null && mException.isAssignableFrom(pException.getCause().getClass())));
+		return
+				pExecutions <= mMaxExecutions && 
+				(
+						valid(pException.getClass()) 
+						|| 
+						(pException.getCause() != null && valid(pException.getCause().getClass()))
+				);
+	}
+
+	private boolean valid(Class<? extends Throwable> pClass) {
+		for (Class<? extends Exception> c : mExceptions) {
+			if (c.isAssignableFrom(pClass)) return true;
+		}
+		return false;
 	}
 }
