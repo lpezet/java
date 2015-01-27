@@ -24,7 +24,7 @@ public class Splitter  implements IWorkSplitter<ProceedingJointPointAndArgs> {
 	private IWorkSplitter<ProceedingJointPointAndArgs> mImpl;
 	
 	public Splitter() {
-		mImpl = Splitters.splitByChunks(3, 1, new MySplitter());
+		mImpl = Splitters.splitByChunks(4, 1, new MySplitter());
 	}
 	
 	@Override
