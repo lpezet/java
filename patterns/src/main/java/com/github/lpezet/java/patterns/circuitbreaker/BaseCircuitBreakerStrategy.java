@@ -45,7 +45,7 @@ public class BaseCircuitBreakerStrategy implements ICircuitBreakerStrategy {
 	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler) {
 		mCircuitBreaker = pCircuitBreaker;
 		mCircuitBreakerHandler = pHandler;
-		mCircuitBreakerCondition = new BaseCircuitBreakerCondition(Exception.class, 1);
+		mCircuitBreakerCondition = new BaseCircuitBreakerCondition(1, Exception.class);
 	}
 	
 	public BaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerHandler pHandler, ICircuitBreakerCondition pCircuitBreakerCondition) {

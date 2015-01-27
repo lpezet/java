@@ -31,8 +31,8 @@ package com.github.lpezet.java.patterns.circuitbreaker;
  */
 public class CircuitBreakerStrategies {
 	
-	public static ICircuitBreakerStrategy newSimpleCircuitBreakerStrategy(int pNumberOfExceptionsToTrip, Class<? extends Exception> pTriper) {
-		return newBaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), new BaseCircuitBreakerCondition(pTriper, pNumberOfExceptionsToTrip));
+	public static ICircuitBreakerStrategy newSimpleCircuitBreakerStrategy(int pNumberOfExceptionsToTrip, Class<? extends Exception>... pTripers) {
+		return newBaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), new BaseCircuitBreakerCondition(pNumberOfExceptionsToTrip, pTripers));
 	}
 	
 	public static ICircuitBreakerStrategy newBaseCircuitBreakerStrategy(ICircuitBreaker pCircuitBreaker, ICircuitBreakerCondition pCondition) {
