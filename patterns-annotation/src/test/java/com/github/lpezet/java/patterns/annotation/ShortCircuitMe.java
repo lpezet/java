@@ -23,7 +23,7 @@ public class ShortCircuitMe implements IShortCircuitMe {
 	}
 	
 	@Override
-	@ShortCircuit(triper=ArrayIndexOutOfBoundsException.class, exceptionsToTrip=1)
+	@ShortCircuit(tripers=ArrayIndexOutOfBoundsException.class, exceptionsToTrip=1)
 	public boolean doSomething() {
 		mTimesExecuted++;
 		System.out.println("## I'm doing something...");
