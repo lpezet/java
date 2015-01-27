@@ -14,17 +14,18 @@ public class RetryMe implements IRetryMe {
 		
 		@Override
 		public boolean shouldThrow(IRetryMe pContext) {
-			return pContext.timesExecuted() % 3 != 0;
+			return pContext.timesExecuted() % 3 == 0;
 		}
 	};
 
+	@Retry(exceptions=ArrayIndexOutOfBoundsException.class, maxExecutions=1)
 	@Override
 	public boolean doSomething() {
 		mExecutions++;
-		System.out.println("## I'm doing something...");
+		//System.out.println("## I'm doing something..." + mExecutions);
 		if (mExceptionThrower.shouldThrow(this))
 			throw new ArrayIndexOutOfBoundsException();
-		System.out.println("## ...I've done something!");
+		//System.out.println("## ...I've done something!");
 		return true;
 	}
 	

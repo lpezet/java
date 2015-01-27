@@ -4,7 +4,6 @@
 package com.github.lpezet.java.patterns.annotation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -27,15 +26,16 @@ public class RetryAspectTest {
 	@Test
 	public void doIt() throws Exception {
 		assertEquals(0, mTest.timesExecuted());
-		assertFalse( doSomething() );
-		assertEquals(1, mTest.timesExecuted());
-		assertFalse( doSomething() );
-		assertEquals(2, mTest.timesExecuted());
-		
 		assertTrue( doSomething() );
-		assertEquals(3, mTest.timesExecuted());
-		assertFalse( doSomething() );
-		assertEquals(4, mTest.timesExecuted());
+		assertEquals(1, mTest.timesExecuted());
+		assertTrue( doSomething() );
+		assertEquals(2, mTest.timesExecuted());
+		assertTrue( doSomething() );
+		assertEquals(4, mTest.timesExecuted()); // #3 retried, see ExceptionThrower.
+		assertTrue( doSomething() );
+		assertEquals(5, mTest.timesExecuted());
+		assertTrue( doSomething() );
+		assertEquals(7, mTest.timesExecuted()); // #6 retried, see ExceptionThrower.
 		
 	}
 	
