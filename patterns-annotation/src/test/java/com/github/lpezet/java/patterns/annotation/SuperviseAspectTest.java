@@ -45,6 +45,7 @@ public class SuperviseAspectTest {
 	
 	@Test
 	public void doIt() throws Exception {
+		setTimeToWait(50);
 		assertEquals(0, mTest.timesExecuted());
 		assertTrue( doSomething() );
 		assertEquals(1, mTest.timesExecuted());
