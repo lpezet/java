@@ -150,7 +150,7 @@ public class AllAspect {
 		if (oCondition instanceof BaseCircuitBreakerCondition) {
 			BaseCircuitBreakerCondition oBaseCondition = (BaseCircuitBreakerCondition) oCondition;
 			oBaseCondition.setExceptionsToTrip(pAnnotation.exceptionsToTrip());
-			oBaseCondition.setTriper(pAnnotation.triper());
+			oBaseCondition.setTripers(pAnnotation.tripers());
 		}
 		ICircuitBreakerHandler oOpenHandler = pAnnotation.openHandler().newInstance();
 		ICircuitBreakerStrategy oStgy = new BaseCircuitBreakerStrategy(new InMemoryCircuitBreaker(), oOpenHandler, oCondition);
@@ -162,7 +162,7 @@ public class AllAspect {
 		if (oCondition instanceof BasicRetryCondition) {
 			BasicRetryCondition oBaseCondition = (BasicRetryCondition) oCondition;
 			oBaseCondition.setMaxExecutions(pAnnotation.maxExecutions());
-			oBaseCondition.setException(pAnnotation.exception());
+			oBaseCondition.setExceptions(pAnnotation.exceptions());
 		}
 		IBackoffStrategy oBackoffStrategy = pAnnotation.backoff().newInstance();
 		if (oBackoffStrategy instanceof ExponentialBackoffStrategy) {
