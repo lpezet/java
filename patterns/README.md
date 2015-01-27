@@ -47,6 +47,12 @@ Both a Command and Worker implementation are provided.
 
 For more info, see [Command Patterns](http://mezzetin.blogspot.com/2014/03/execute-retry-trip.html).
 
+### Split-Process-Merge (SPM) Pattern
+This patterns provides a simple way to "divide and conquer", create chunks of work, process in parallel and merge the results.
+This is very similar to MapReduce, in an extremely simplistic way.
+
+For more info, see [Worker Patterns](http://mezzetin.blogspot.com/2014/04/worker-pattern.html).
+
 
 Installation
 ------------
