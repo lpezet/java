@@ -16,7 +16,7 @@ public class TakeCareOfMe implements ITakeCareOfMe {
 	private volatile IBehavior mBehavior;
 
 	@ShortCircuit(exceptionsToTrip=1)
-	@Retry(exception=TimeoutException.class)
+	@Retry(exceptions=TimeoutException.class)
 	@Supervise(timeout=100, timeunit=TimeUnit.MILLISECONDS)
 	public boolean doSomething() throws Exception {
 		mBehavior.behave();
