@@ -71,8 +71,7 @@ public class GoogleBooksSearchSample {
 		}
 	}
 
-	private static class GoogleBooksSearchIterator extends
-			PaginationIterator<List<Volume>> {
+	private static class GoogleBooksSearchIterator extends PaginationIterator<List<Volume>> {
 
 		private com.google.api.services.books.Books.Volumes.List mSearch;
 
@@ -112,8 +111,8 @@ public class GoogleBooksSearchSample {
 	@Test
 	public void doIt() throws Exception {
 		// either one
-		iterableLoop();
 		//iterableLoop();
+		iteratorLoop();
 	}
 
 	public void iteratorLoop() throws Exception {
