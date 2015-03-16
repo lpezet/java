@@ -32,7 +32,7 @@ package com.github.lpezet.java.patterns.worker;
  *
  * @param <W> Input
  * @param <R> Output
- * @param <S> Intemediary output
+ * @param <S> Intermediary output
  */
 public class ChainWorker<W,R,S> implements IWorker<W, R> {
 	
@@ -47,5 +47,13 @@ public class ChainWorker<W,R,S> implements IWorker<W, R> {
 	public R perform(W pWork) throws Exception {
 		S oResult = mRight.perform(pWork);
 		return mLeft.perform(oResult);
+	}
+	
+	public IWorker<S, R> getLeft() {
+		return mLeft;
+	}
+	
+	public IWorker<W, S> getRight() {
+		return mRight;
 	}
 }
