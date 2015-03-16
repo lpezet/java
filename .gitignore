@@ -5,3 +5,4 @@
 .externalToolBuilders
 target
 bak
+.DS_Store
