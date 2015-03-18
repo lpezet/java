@@ -88,7 +88,7 @@ public class HttpWorkerSample {
 		
 		ICircuitBreakerStrategy oCircuiteBreakerStrategy = CircuitBreakerStrategies.newSingleTryCircuitBreakerStrategy();
 		CircuitBreakerWorker<HttpUriRequest, HttpResponse> oCB = new CircuitBreakerWorker<HttpUriRequest, HttpResponse>(oRetry, oCircuiteBreakerStrategy);
-		for (int i = 0; i < 25; i++) {
+		for (int i = 0; i < 33; i++) {
 			try {
 				Thread.sleep(70);
 				oCB.perform( new HttpGet("http://something.com/" + i) );
