@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.lpezet.java</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.5</version>
 	<packaging>pom</packaging>
 
 	<distributionManagement>
@@ -154,7 +154,7 @@
 		<connection>scm:git:ssh://git@github.com/lpezet/java.git</connection>
     	<developerConnection>scm:git:ssh://git@github.com/lpezet/java.git</developerConnection>
 		<url>https://github.com/lpezet/java</url>
-	  <tag>HEAD</tag>
+	  <tag>parent-0.0.5</tag>
   </scm>
 
 
