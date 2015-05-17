@@ -48,9 +48,10 @@ public class Splitters {
 	/**
 	 * Splitting in fixed amount of work. So splitting 100 into chunks of 20 will yield 5 chunks. 
 	 * 
-	 * @param pChunkSize
-	 * @param pSplitter
-	 * @return
+	 * @param pChunkSize Check size
+	 * @param pSplitter Splitter
+	 * @param <T> Type
+	 * @return IWorkSplitter
 	 */
 	public static <T> IWorkSplitter<T> splitByChunkSize(final int pChunkSize, final ISimpleSplitter<T> pSplitter) {
 		return new IWorkSplitter<T>() {
@@ -80,10 +81,11 @@ public class Splitters {
 	 * Splitting working into fixed amount of chunks. For example, 100 split into 5 chunks will yield chunks of 20 work each.
 	 * pChunks could be set to Runtime.availableProcessor() for example. 
 	 * 
-	 * @param pChunks
-	 * @param pMinChunkSize
-	 * @param pSplitter
-	 * @return
+	 * @param pChunks Chunks
+	 * @param pMinChunkSize Minimum chunk size
+	 * @param pSplitter Splitter
+	 * @param <T> Type
+	 * @return IWorkSplitter
 	 */
 	public static <T> IWorkSplitter<T> splitByChunks(final int pChunks, final int pMinChunkSize, final ISimpleSplitter<T> pSplitter) {
 		return new IWorkSplitter<T>() {

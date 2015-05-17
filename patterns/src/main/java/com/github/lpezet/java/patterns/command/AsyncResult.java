@@ -60,6 +60,9 @@ public class AsyncResult<T> implements IAsyncResult<T> {
 	
 	/**
 	 * Executes command with custom callable.
+	 * 
+	 * @param pExecutorService Executor Service
+	 * @param pImpl Implementation
 	 */
 	public AsyncResult(ExecutorService pExecutorService, final ICommand<T> pImpl) {
 		mFutureResult = pExecutorService.submit(new Callable<ResultOrException<T>>() {

@@ -37,22 +37,22 @@ public class CircuitBreakerOpenException extends RuntimeException {
 	}
 
 	/**
-	 * @param message
+	 * @param message message
 	 */
 	public CircuitBreakerOpenException(String message) {
 		super(message);
 	}
 
 	/**
-	 * @param cause
+	 * @param cause cause
 	 */
 	public CircuitBreakerOpenException(Throwable cause) {
 		super(cause);
 	}
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @param message message
+	 * @param cause cause
 	 */
 	public CircuitBreakerOpenException(String message, Throwable cause) {
 		super(message, cause);
