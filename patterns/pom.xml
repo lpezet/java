@@ -3,6 +3,7 @@
 	<artifactId>patterns</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
 	<inceptionYear>2014</inceptionYear>
+	<packaging>jar</packaging>
 	<parent>
 		<groupId>com.github.lpezet.java</groupId>
 		<artifactId>parent</artifactId>
