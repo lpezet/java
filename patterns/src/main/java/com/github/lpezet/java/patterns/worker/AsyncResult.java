@@ -26,9 +26,11 @@
 package com.github.lpezet.java.patterns.worker;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 
 /**
@@ -36,6 +38,33 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class AsyncResult<R> implements IAsyncResult<R> {
+	
+	private static class InstantenousFuture<V> implements Future<ResultOrException<V>> {
+		
+		private final ResultOrException<V> mResultOrException;
+		
+		public InstantenousFuture(V pValue) {
+			mResultOrException = new ResultOrException<V>( pValue );
+		}
+		@Override
+		public boolean cancel(boolean pMayInterruptIfRunning) { return false; }
+		@Override
+		public ResultOrException<V> get() throws InterruptedException, ExecutionException {
+			return mResultOrException;
+		}
+		@Override
+		public ResultOrException<V> get(long pTimeout, TimeUnit pUnit) throws InterruptedException, ExecutionException, TimeoutException {
+			return mResultOrException;
+		}
+		@Override
+		public boolean isCancelled() {
+			return false;
+		}
+		@Override
+		public boolean isDone() {
+			return true;
+		}
+	}
 
 	private static class ResultOrException<T> {
 		private T mResult;
@@ -88,6 +117,10 @@ public class AsyncResult<R> implements IAsyncResult<R> {
 				return oError == null ? new ResultOrException<R>(oResults) : new ResultOrException<R>(oError);		
 			}
 		});
+	}
+	
+	public AsyncResult(R pResult) {
+		mFutureResult = new InstantenousFuture<R>(pResult);
 	}
 
 	@Override
