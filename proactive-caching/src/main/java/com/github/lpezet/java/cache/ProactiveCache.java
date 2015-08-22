@@ -1,4 +1,26 @@
 /**
+ * The MIT License
+ * Copyright (c) 2014 Luc Pezet
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+/**
  * 
  */
 package com.github.lpezet.java.cache;
@@ -50,14 +72,23 @@ public class ProactiveCache<T> implements Cache<CommandAugmentedItem<T>> {
 			}
 		}
 		
-		public void remove(String pKey) {
+		public CacheEntry<T> get(String pKey) {
+			return mKeyToCacheEntryMap.get(pKey);
+		}
+		
+		public synchronized void remove(String pKey) {
 			CacheEntry<T> oMapped = mKeyToCacheEntryMap.get(pKey);
 			if (oMapped == null) return;
 			mCacheEntries.remove(oMapped);
 		}
 		
-		public Set<CacheEntry<T>> getCacheEntries() {
+		public synchronized Set<CacheEntry<T>> getCacheEntries() {
 			return mCacheEntries;
+		}
+		
+		public synchronized void clear() {
+			mKeyToCacheEntryMap.clear();
+			mCacheEntries.clear();
 		}
 		
 	}
@@ -105,8 +136,10 @@ public class ProactiveCache<T> implements Cache<CommandAugmentedItem<T>> {
 		@Override
 		public void run() {
 			Instant oNow = Instant.now();
+			
 			// Go through data to be expired
 			for (CacheEntry<T> e : mCacheEntries.getCacheEntries()) {
+				if (!oNow.isAfter( e.getLastRefreshed())) break;
 				Interval i = new Interval(e.getLastRefreshed(), oNow);
 				if (i.toDurationMillis() <= mPolicy.getTimeToLiveInMillis()) {
 					break; // Set is ordered so as soon as we get to an entry that has not expired, we quit.
@@ -150,12 +183,38 @@ public class ProactiveCache<T> implements Cache<CommandAugmentedItem<T>> {
 	}
 
 	public CacheItem<CommandAugmentedItem<T>> get(String pKey) {
+		CacheEntry<T> oEntry = mCacheEntries.get( pKey );
 		CacheItem<T> oCached = mImpl.get(pKey);
-		return new BasicCacheItem<CommandAugmentedItem<T>>(pKey, new BasicCommandAugmentedItem<T>(oCached.getValue(), null));
+		if (oEntry != null && oCached != null) {
+			return new BasicCacheItem<CommandAugmentedItem<T>>(pKey, new BasicCommandAugmentedItem<T>(oCached.getValue(), oEntry.getCommand()));
+		} else {
+			//TODO: Log!!!!!
+			return null;
+		}
+		// why???
+		//CacheItem<T> oCached = mImpl.get(pKey);
+		//return new BasicCacheItem<CommandAugmentedItem<T>>(pKey, new BasicCommandAugmentedItem<T>(oCached.getValue(), null));
 	}
 
 	public void remove(String pKey) {
 		mImpl.remove(pKey);
+		mCacheEntries.remove(pKey);
+	}
+	
+	@Override
+	public void clear() {
+		mImpl.clear();
+		mCacheEntries.clear();
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return mImpl.isEmpty();
+	}
+	
+	@Override
+	public int size() {
+		return mImpl.size();
 	}
 
 }

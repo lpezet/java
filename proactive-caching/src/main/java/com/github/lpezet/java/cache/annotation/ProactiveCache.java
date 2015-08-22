@@ -20,42 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/**
- * 
- */
-package com.github.lpezet.java.cache;
+package com.github.lpezet.java.cache.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author luc
+ * @author Luc Pezet
  *
  */
-public class BasicCacheItem<T> implements CacheItem<T> {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ProactiveCache {
+
+	Class<? extends KeyFactory> keyFactory() default ArrayAsListToStringKeyFactory.class;
 	
-	private String mKey;
-	private T mValue;
-	
-	public BasicCacheItem() {
-	}
-	
-	public BasicCacheItem(String pKey, T pValue) {
-		setKey(pKey);
-		setValue(pValue);
-	}
-
-	public String getKey() {
-		return mKey;
-	}
-
-	public void setKey(String pKey) {
-		mKey = pKey;
-	}
-
-	public T getValue() {
-		return mValue;
-	}
-
-	public void setValue(T pValue) {
-		mValue = pValue;
-	}
-
 }

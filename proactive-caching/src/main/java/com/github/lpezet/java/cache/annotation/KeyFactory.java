@@ -23,39 +23,14 @@
 /**
  * 
  */
-package com.github.lpezet.java.cache;
+package com.github.lpezet.java.cache.annotation;
 
 /**
- * @author luc
+ * @author Luc Pezet
  *
  */
-public class BasicCacheItem<T> implements CacheItem<T> {
+public interface KeyFactory {
+
+	public String createKey(Object[] pArgs);
 	
-	private String mKey;
-	private T mValue;
-	
-	public BasicCacheItem() {
-	}
-	
-	public BasicCacheItem(String pKey, T pValue) {
-		setKey(pKey);
-		setValue(pValue);
-	}
-
-	public String getKey() {
-		return mKey;
-	}
-
-	public void setKey(String pKey) {
-		mKey = pKey;
-	}
-
-	public T getValue() {
-		return mValue;
-	}
-
-	public void setValue(T pValue) {
-		mValue = pValue;
-	}
-
 }
