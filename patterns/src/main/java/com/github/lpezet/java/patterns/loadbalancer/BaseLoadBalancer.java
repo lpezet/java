@@ -32,6 +32,11 @@ public abstract class BaseLoadBalancer<T> implements ILoadBalancer<T> {
 	public abstract boolean hasNext();
 	
 	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+	
+	@Override
 	public T next() {
 		T oResource = pickResource();
 		if (oResource == null)
