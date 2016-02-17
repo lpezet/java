@@ -21,12 +21,6 @@
 	</ciManagement>
 	<profiles>
 		<profile>
-			<id>jdk6</id>
-			<properties>
-				<java.compiler.version>1.6</java.compiler.version>
-			</properties>
-		</profile>
-		<profile>
 			<id>jdk7</id>
 			<properties>
 				<java.compiler.version>1.7</java.compiler.version>
@@ -112,7 +106,7 @@
 	</profiles>
 	<properties>
 		<!-- This way Eclipse can setup project using version 1.6 by default -->
-		<java.compiler.version>1.6</java.compiler.version>
+		<java.compiler.version>1.7</java.compiler.version>
 		<java.compiler.showWarnings>true</java.compiler.showWarnings>
 		<java.compiler.debug>true</java.compiler.debug>
 		<java.compiler.optimize>false</java.compiler.optimize>
