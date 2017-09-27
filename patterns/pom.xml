@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>patterns</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.3</version>
 	<inceptionYear>2014</inceptionYear>
 	<packaging>jar</packaging>
 	<parent>
@@ -27,7 +27,7 @@
 		<connection>scm:git:git@github.com:lpezet/java.git</connection>
 		<url>scm:git:git@github.com:lpezet/java.git</url>
 		<developerConnection>scm:git:git@github.com:lpezet/java.git</developerConnection>
-	  <tag>HEAD</tag>
+	  <tag>patterns-0.0.3</tag>
   	</scm>
 	
 	<build>
