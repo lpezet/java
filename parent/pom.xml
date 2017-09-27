@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.lpezet.java</groupId>
 	<artifactId>parent</artifactId>
@@ -140,6 +141,10 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<configuration>
+									<keyname>738CC4DD1606B7F74421BA729675DB9A5117DFFC</keyname>
+									<passphraseServerId>gpg.738CC4DD1606B7F74421BA729675DB9A5117DFFC</passphraseServerId>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -214,8 +219,8 @@
 		<connection>scm:git:git@github.com:lpezet/java.git</connection>
 		<url>scm:git:git@github.com:lpezet/java.git</url>
 		<developerConnection>scm:git:git@github.com:lpezet/java.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<build>
 		<!-- <extensions> <extension> <groupId>org.apache.maven.wagon</groupId> 
