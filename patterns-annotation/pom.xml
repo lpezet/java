@@ -4,6 +4,22 @@
 	<artifactId>patterns-annotation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<inceptionYear>2015</inceptionYear>
+	<name>Java Utilities Library Patterns Annotation Module</name>
+	<description>Java Utilities Library</description>
+	<url>https://github.com/lpezet/java</url>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>lpezet</id>
+			<name>Luke Pezet</name>
+		</developer>
+	</developers>
 	<parent>
 		<groupId>com.github.lpezet.java</groupId>
 		<artifactId>parent</artifactId>
