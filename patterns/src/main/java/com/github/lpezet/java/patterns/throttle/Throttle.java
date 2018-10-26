@@ -24,25 +24,53 @@ package com.github.lpezet.java.patterns.throttle;
 
 import java.util.concurrent.Callable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Luc Pezet
  *
  */
-public abstract class Throttle<T> implements IThrottle<T> {
+public class Throttle<T> implements IThrottle<T> {
 	
-	private IThrottleStrategy mStrategy;
+	protected Logger mLogger = LoggerFactory.getLogger( this.getClass() );
+	
+	protected IThrottleStrategy mStrategy;
+	private boolean mRethrow = false;
 	
 	public Throttle(IThrottleStrategy pStrategy) {
 		mStrategy = pStrategy;
 	}
 	
 	@Override
-	public T throttle(Callable<T> pCallable) throws Exception {
-		//TODO
-		String oKey = pCallable.toString();
-		
+	public T throttleWithException(Callable<T> pCallable) throws Exception {
+		while( mStrategy.isThrottled() ) {
+			//System.out.println("[" + Thread.currentThread().getName() + "] Sleeping for " + mStrategy.getWaitTime() + "ms...");
+			Thread.sleep(mStrategy.getWaitTime() + 1);
+		}
 		return pCallable.call();
 	}
 	
+	@Override
+	public T throttle(Callable<T> pCallable) {
+		try {
+			return throttleWithException(pCallable);
+		} catch (Exception e) {
+			mLogger.error("Unexpected error throttling callable.", e);
+			if (mRethrow) {
+				throw new RuntimeException( e.getCause() );
+			} else {
+				return null;
+			}
+		}
+	}
+	
+	public void setRethrow(boolean pRethrow) {
+		mRethrow = pRethrow;
+	}
+	
+	public boolean isRethrow() {
+		return mRethrow;
+	}
 	
 }
