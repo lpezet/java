@@ -38,8 +38,13 @@ public class FixedTokenBucketStrategy extends TokenBucketStrategy {
 		long oCurrentTime = System.currentTimeMillis();
         if( oCurrentTime < mNextRefillTime ) return;
 
-        mTokens = mCapacity;
+        refill();
+        
         mNextRefillTime = mRefillStrategy.nextRefill( oCurrentTime );// oCurrentTime + mRefillInterval;
+	}
+	
+	protected void refill() {
+		mTokens = mCapacity;
 	}
 	
 }
