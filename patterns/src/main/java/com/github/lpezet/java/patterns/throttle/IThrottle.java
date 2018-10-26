@@ -30,6 +30,8 @@ import java.util.concurrent.Callable;
  */
 public interface IThrottle<T> {
 
-	public T throttle(final Callable<T> pCallable) throws Exception;
+	public T throttleWithException(final Callable<T> pCallable) throws Exception;
+	
+	public T throttle(final Callable<T> pCallable);
 	
 }
