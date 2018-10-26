@@ -32,6 +32,10 @@ public interface IThrottleStrategy {
 	
 	public boolean isThrottled(long n);
 	
-	public long getNextRefillTime();
+	//public long getNextRefillTime();
+	
+	public long getWaitTime();
+	
+	public long getWaitTime(long n);
 	
 }

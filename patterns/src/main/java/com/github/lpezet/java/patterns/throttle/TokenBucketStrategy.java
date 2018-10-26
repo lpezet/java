@@ -28,7 +28,7 @@ import com.github.lpezet.java.patterns.util.Assert;
  * @author Luc Pezet
  *
  */
-public abstract class TokenBucketStrategy implements IThrottleStrategy {
+public abstract class TokenBucketStrategy extends ThrottleStrategySupport {
 	
 	protected final long mCapacity;
 	protected final IRefillStrategy mRefillStrategy;
@@ -51,17 +51,18 @@ public abstract class TokenBucketStrategy implements IThrottleStrategy {
 		return mNextRefillTime;
 	}
 	
+	@Override
+	public synchronized long getWaitTime(long n) {
+		// if n > Capacity, what to do?
+		return Math.min(0, mNextRefillTime - System.currentTimeMillis());
+	}
+	
 	public long getRefillIntervalInMillis() {
 		return mRefillStrategy.getIntervalInMillis();
 	}
 	
 	public long getTokens() {
 		return mTokens;
-	}
-
-	@Override
-	public synchronized boolean isThrottled() {
-		return isThrottled( 1 );
 	}
 	
 	@Override
